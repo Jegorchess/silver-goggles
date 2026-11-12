@@ -1,0 +1,523 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KinoBattle Preview</title>
+<!--
+  Інтерактивний макет iOS-застосунку для перегляду на Windows (у VS Code Simple Browser).
+  Логіка — порт KinoBattleApp/Engine/*.swift; питання береться з того самого KinoBattleApp/questions.json.
+  Якщо змінюєш правила в Swift, онови й константи нижче.
+-->
+<style>
+  :root {
+    --bg: #1b1b22;
+    --screen: #0d0d14;
+    --card: #1c1c28;
+    --card-hi: #262636;
+    --text: #f4f4f8;
+    --muted: #9a9ab0;
+    --accent: #ff4d6d;
+    --gold: #ffc94d;
+    --good: #2fd27a;
+    --bad: #ff5a5a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    background: var(--bg);
+    font-family: -apple-system, "SF Pro Display", "Segoe UI", system-ui, sans-serif;
+    color: var(--text);
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+  #stage { width: 390px; height: 844px; transform-origin: center; flex: none; }
+  .phone {
+    position: relative; width: 390px; height: 844px;
+    border-radius: 56px; background: var(--screen);
+    box-shadow: 0 0 0 11px #2c2c33, 0 0 0 13px #4a4a55, 0 30px 80px rgba(0,0,0,.6);
+    overflow: hidden;
+  }
+  .island {
+    position: absolute; top: 11px; left: 50%; transform: translateX(-50%);
+    width: 122px; height: 35px; border-radius: 20px; background: #000; z-index: 10;
+  }
+  .statusbar {
+    position: absolute; top: 0; left: 0; right: 0; height: 54px; z-index: 9;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 6px 34px 0; font-size: 16px; font-weight: 600;
+  }
+  .homebar {
+    position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
+    width: 134px; height: 5px; border-radius: 3px; background: rgba(255,255,255,.85); z-index: 10;
+  }
+  .screen { position: absolute; inset: 54px 0 34px; display: flex; flex-direction: column; padding: 12px 20px 16px; }
+  .hidden { display: none !important; }
+
+  button {
+    font: inherit; color: inherit; border: none; cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn {
+    width: 100%; padding: 17px; border-radius: 16px; font-size: 18px; font-weight: 700;
+    background: var(--accent); color: #fff; transition: transform .08s;
+  }
+  .btn:active { transform: scale(.97); }
+  .btn.secondary { background: var(--card-hi); }
+
+  /* Головний */
+  #home { justify-content: space-between; text-align: center; }
+  .logo { margin-top: 60px; font-size: 80px; }
+  .title { font-size: 36px; font-weight: 800; letter-spacing: -.5px; margin-top: 8px; }
+  .title span { color: var(--accent); }
+  .subtitle { color: var(--muted); margin-top: 10px; font-size: 16px; line-height: 1.4; }
+  .rules { background: var(--card); border-radius: 18px; padding: 16px 18px; text-align: left; font-size: 15px; line-height: 1.7; color: var(--muted); }
+  .rules b { color: var(--text); font-weight: 600; }
+  .segmented { display: flex; background: var(--card); border-radius: 14px; padding: 4px; margin-bottom: 14px; }
+  .segmented button { flex: 1; padding: 11px 0; border-radius: 10px; background: transparent; color: var(--muted); font-size: 15px; font-weight: 600; transition: background .15s, color .15s; }
+  .segmented button.on { background: var(--card-hi); color: var(--text); }
+  .vs-card { display: flex; align-items: center; justify-content: center; gap: 18px; margin-bottom: 14px; }
+  .vs-card .who { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 14px; color: var(--muted); }
+  .vs-card .ava { font-size: 40px; width: 64px; height: 64px; border-radius: 50%; background: var(--card); display: grid; place-items: center; }
+  .vs-card .vs { font-weight: 800; color: var(--accent); }
+
+  /* Матч */
+  .scorebar { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .player { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .player.right { flex-direction: row-reverse; text-align: right; }
+  .player .ava { font-size: 26px; width: 46px; height: 46px; border-radius: 50%; background: var(--card); display: grid; place-items: center; flex: none; position: relative; }
+  .player .ava .tick {
+    position: absolute; right: -3px; bottom: -3px; width: 20px; height: 20px; border-radius: 50%;
+    background: var(--good); color: #000; font-size: 12px; font-weight: 800; display: grid; place-items: center;
+  }
+  .player .name { font-size: 13px; color: var(--muted); }
+  .player .score { font-size: 22px; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .counter { font-size: 14px; font-weight: 700; color: var(--muted); background: var(--card); padding: 6px 12px; border-radius: 12px; flex: none; }
+  .counter.final { color: #000; background: var(--gold); }
+
+  .timer { margin-top: 18px; display: flex; align-items: center; gap: 10px; }
+  .timer .track { flex: 1; height: 8px; border-radius: 4px; background: var(--card); overflow: hidden; }
+  .timer .fill { height: 100%; width: 100%; background: var(--good); border-radius: 4px; }
+  .timer .num { width: 30px; text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+  .question { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 10px 4px; }
+  .question .hint { color: var(--gold); font-weight: 700; font-size: 15px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+  .question .prompt { font-size: 24px; font-weight: 700; line-height: 1.3; }
+  .question .prompt.emoji { font-size: 64px; letter-spacing: 6px; }
+
+  .options { display: flex; flex-direction: column; gap: 10px; min-height: 278px; }
+  .opt {
+    position: relative; text-align: left; padding: 17px 18px; border-radius: 16px;
+    background: var(--card); font-size: 17px; font-weight: 600;
+    border: 2px solid transparent; transition: background .15s, border-color .15s, opacity .15s, transform .08s;
+    animation: pop .25s ease-out both;
+  }
+  .opt:nth-child(2) { animation-delay: .04s; } .opt:nth-child(3) { animation-delay: .08s; } .opt:nth-child(4) { animation-delay: .12s; }
+  .opt:active:not(:disabled) { transform: scale(.98); }
+  .opt:disabled { cursor: default; }
+  .opt.picked { border-color: var(--text); background: var(--card-hi); }
+  .opt.correct { background: rgba(47,210,122,.18); border-color: var(--good); }
+  .opt.wrong { background: rgba(255,90,90,.16); border-color: var(--bad); }
+  .opt.dim { opacity: .45; }
+  .opt .marks { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); display: flex; gap: 4px; }
+  .opt .marks span { width: 28px; height: 28px; border-radius: 50%; background: var(--screen); display: grid; place-items: center; font-size: 15px; }
+  @keyframes pop { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  .gain { position: absolute; font-weight: 800; font-size: 18px; color: var(--good); animation: rise 1.4s ease-out forwards; pointer-events: none; }
+  @keyframes rise { 0% { opacity: 0; transform: translateY(6px); } 20% { opacity: 1; } 100% { opacity: 0; transform: translateY(-24px); } }
+
+  .banner {
+    position: absolute; inset: 0; z-index: 5; display: grid; place-items: center; text-align: center;
+    background: rgba(13,13,20,.92); animation: fade .2s ease-out;
+  }
+  .banner div { font-size: 34px; font-weight: 800; line-height: 1.2; }
+  .banner b { display: block; color: var(--gold); font-size: 64px; margin-top: 6px; }
+  @keyframes fade { from { opacity: 0; } }
+
+  /* Результат */
+  #result { text-align: center; justify-content: space-between; }
+  .verdict-emoji { font-size: 84px; margin-top: 50px; }
+  .verdict { font-size: 38px; font-weight: 800; margin-top: 6px; }
+  .verdict.win { color: var(--gold); } .verdict.loss { color: var(--bad); } .verdict.draw { color: var(--muted); }
+  .final-scores { display: flex; gap: 12px; margin-top: 28px; }
+  .final-scores .col { flex: 1; background: var(--card); border-radius: 18px; padding: 18px 10px; }
+  .final-scores .col.winner { box-shadow: inset 0 0 0 2px var(--gold); }
+  .final-scores .ava { font-size: 36px; }
+  .final-scores .nm { color: var(--muted); font-size: 14px; margin-top: 4px; }
+  .final-scores .pts { font-size: 30px; font-weight: 800; margin-top: 6px; font-variant-numeric: tabular-nums; }
+  .final-scores .cr { color: var(--muted); font-size: 14px; margin-top: 2px; }
+  .actions { display: flex; flex-direction: column; gap: 10px; }
+
+  .error { margin: auto; text-align: center; color: var(--muted); line-height: 1.5; }
+  .error b { color: var(--bad); display: block; font-size: 18px; margin-bottom: 8px; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="phone">
+    <div class="island"></div>
+    <div class="statusbar"><span id="clock">9:41</span><span>📶 🔋</span></div>
+
+    <section id="home" class="screen">
+      <div>
+        <div class="logo">🎬</div>
+        <div class="title">Kino<span>Battle</span></div>
+        <div class="subtitle">Кіно-квіз дуель 1 на 1</div>
+      </div>
+      <div class="rules">
+        <b id="rules-count">7 питань</b> про кіно · <b>10 секунд</b> на кожне<br>
+        Швидше відповів — <b>більше очок</b><br>
+        Фінальне питання — <b>×2</b>
+      </div>
+      <div>
+        <div class="vs-card">
+          <div class="who"><div class="ava">🎬</div>Ти</div>
+          <div class="vs">VS</div>
+          <div class="who"><div class="ava" id="home-bot-ava"></div><span id="home-bot-name"></span></div>
+        </div>
+        <div class="segmented" id="length-picker"></div>
+        <button class="btn" id="play">Грати</button>
+      </div>
+    </section>
+
+    <section id="match" class="screen hidden">
+      <div class="scorebar">
+        <div class="player">
+          <div class="ava">🎬<span class="tick hidden" id="me-tick">✓</span></div>
+          <div><div class="name">Ти</div><div class="score" id="me-score">0</div></div>
+        </div>
+        <div class="counter" id="counter">1/7</div>
+        <div class="player right">
+          <div class="ava"><span id="bot-ava"></span><span class="tick hidden" id="bot-tick">✓</span></div>
+          <div><div class="name" id="bot-name"></div><div class="score" id="bot-score">0</div></div>
+        </div>
+      </div>
+      <div class="timer">
+        <div class="track"><div class="fill" id="timer-fill"></div></div>
+        <div class="num" id="timer-num">10</div>
+      </div>
+      <div class="question">
+        <div class="hint hidden" id="hint">Вгадай фільм</div>
+        <div class="prompt" id="prompt"></div>
+      </div>
+      <div class="options" id="options"></div>
+      <div class="banner hidden" id="banner"><div>Фінальне питання<b>×2</b></div></div>
+    </section>
+
+    <section id="result" class="screen hidden">
+      <div>
+        <div class="verdict-emoji" id="verdict-emoji"></div>
+        <div class="verdict" id="verdict"></div>
+        <div class="final-scores">
+          <div class="col" id="res-me"><div class="ava">🎬</div><div class="nm">Ти</div><div class="pts"></div><div class="cr"></div></div>
+          <div class="col" id="res-bot"><div class="ava"></div><div class="nm"></div><div class="pts"></div><div class="cr"></div></div>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn" id="rematch">Реванш</button>
+        <button class="btn secondary" id="to-home">На головну</button>
+      </div>
+    </section>
+
+    <div class="homebar"></div>
+  </div>
+</div>
+
+<script>
+// ===== Порт Engine/Scoring.swift =====
+const MatchRules = { questionsPerMatch: 7, matchLengths: [7, 14], questionTime: 10, promptLeadIn: 1, revealDuration: 2, finalBannerDuration: 1.5 };
+const Scoring = {
+  basePoints: 500, speedPoints: 500,
+  multiplier(i, total = MatchRules.questionsPerMatch) { return i === total - 1 ? 2 : 1; },
+  points(isCorrect, timeLeft, multiplier) {
+    if (!isCorrect || timeLeft == null || timeLeft <= 0) return 0;
+    const clamped = Math.min(timeLeft, MatchRules.questionTime);
+    const tenths = Math.floor(clamped * 10) / 10;
+    // Swift .rounded() — до найближчого, половини від нуля; для додатних збігається з Math.round.
+    return Math.round(this.basePoints + this.speedPoints * tenths / MatchRules.questionTime) * multiplier;
+  },
+};
+function decideOutcome(ps, os, pc, oc) {
+  if (ps !== os) return ps > os ? 'win' : 'loss';
+  if (pc !== oc) return pc > oc ? 'win' : 'loss';
+  return 'draw';
+}
+
+// ===== Порт Engine/Opponent.swift (BotConfig за замовчуванням) =====
+const BotConfig = { name: 'Кіноман', avatar: '🍿', accuracy: 0.7, answerTime: [3, 7] };
+function shuffled(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+function botPlan(round) {
+  const [lo, hi] = BotConfig.answerTime;
+  const delay = lo + Math.random() * (hi - lo);
+  const isCorrect = Math.random() < BotConfig.accuracy;
+  const wrong = round.options.map((_, i) => i).filter(i => i !== round.correctIndex);
+  return { optionIndex: isCorrect ? round.correctIndex : wrong[Math.floor(Math.random() * wrong.length)], delay };
+}
+
+// ===== Порт Engine/Question.swift + QuestionBank.swift =====
+function makeRound(q) {
+  const order = shuffled(q.options.map((_, i) => i));
+  return { question: q, options: order.map(i => q.options[i]), correctIndex: order.indexOf(q.correctIndex) };
+}
+function pickQuestions(all, count, recent) {
+  const recentSet = new Set(recent);
+  const result = shuffled(all.filter(q => !recentSet.has(q.id)));
+  if (result.length >= count) return result.slice(0, count);
+  const byId = new Map(all.map(q => [q.id, q]));
+  const added = new Set(result.map(q => q.id));
+  for (const id of recent) {
+    if (result.length >= count) break;
+    if (byId.has(id) && !added.has(id)) { added.add(id); result.push(byId.get(id)); }
+  }
+  return result;
+}
+const RECENT_KEY = 'kinobattle.recent';
+const LENGTH_KEY = 'kinobattle.matchLength';
+function loadRecent() { try { return JSON.parse(localStorage.getItem(RECENT_KEY)) || []; } catch { return []; } }
+function saveRecent(ids) { try { localStorage.setItem(RECENT_KEY, JSON.stringify(ids)); } catch {} }
+function loadLength() {
+  try { const n = Number(localStorage.getItem(LENGTH_KEY)); if (MatchRules.matchLengths.includes(n)) return n; } catch {}
+  return MatchRules.questionsPerMatch;
+}
+function saveLength(n) { try { localStorage.setItem(LENGTH_KEY, String(n)); } catch {} }
+
+// ===== UI =====
+const $ = id => document.getElementById(id);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+let bank = [];
+let matchLength = loadLength();
+let matchToken = 0; // щоб «На головну» коректно обривав поточний матч
+
+function renderLengthPicker() {
+  const box = $('length-picker');
+  box.innerHTML = '';
+  for (const n of MatchRules.matchLengths) {
+    const b = document.createElement('button');
+    b.textContent = `${n} питань`;
+    b.classList.toggle('on', n === matchLength);
+    b.onclick = () => { matchLength = n; saveLength(n); renderLengthPicker(); };
+    box.appendChild(b);
+  }
+  $('rules-count').textContent = `${matchLength} питань`;
+}
+
+function show(screen) {
+  for (const id of ['home', 'match', 'result']) $(id).classList.toggle('hidden', id !== screen);
+}
+
+function fitToWindow() {
+  const s = Math.min(1, (innerHeight - 40) / 844, (innerWidth - 40) / 390);
+  $('stage').style.transform = `scale(${s})`;
+}
+
+function tickClock() {
+  const d = new Date();
+  $('clock').textContent = `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`;
+}
+
+function renderRound(round) {
+  const isEmoji = round.question.type === 'emoji';
+  $('hint').classList.toggle('hidden', !isEmoji);
+  $('prompt').classList.toggle('emoji', isEmoji);
+  $('prompt').textContent = round.question.prompt;
+  $('options').innerHTML = '';
+}
+
+function renderOptions(round, onPick) {
+  const box = $('options');
+  box.innerHTML = '';
+  round.options.forEach((text, i) => {
+    const b = document.createElement('button');
+    b.className = 'opt';
+    b.innerHTML = `<span></span><span class="marks"></span>`;
+    b.firstChild.textContent = text;
+    b.onclick = () => onPick(i);
+    box.appendChild(b);
+  });
+}
+
+function setTimer(left) {
+  const frac = Math.max(0, left) / MatchRules.questionTime;
+  const fill = $('timer-fill');
+  fill.style.width = `${frac * 100}%`;
+  fill.style.background = frac > 0.5 ? 'var(--good)' : frac > 0.25 ? 'var(--gold)' : 'var(--bad)';
+  $('timer-num').textContent = Math.ceil(Math.max(0, left));
+}
+
+function floatGain(anchor, points) {
+  if (!points) return;
+  const el = document.createElement('div');
+  el.className = 'gain';
+  el.textContent = `+${points}`;
+  const host = $('match');
+  const a = anchor.getBoundingClientRect(), h = host.getBoundingClientRect();
+  const scale = h.width / host.offsetWidth;
+  el.style.left = `${(a.left - h.left) / scale}px`;
+  el.style.top = `${(a.bottom - h.top) / scale + 2}px`;
+  host.appendChild(el);
+  setTimeout(() => el.remove(), 1500);
+}
+
+async function playMatch() {
+  const token = ++matchToken;
+  const alive = () => token === matchToken;
+  const recent = loadRecent();
+  const questions = pickQuestions(bank, matchLength, recent);
+  // Памʼятаємо питання двох найдовших матчів.
+  const keep = Math.max(...MatchRules.matchLengths) * 2;
+  saveRecent([...recent.filter(id => !questions.some(q => q.id === id)), ...questions.map(q => q.id)].slice(-keep));
+
+  const st = { me: 0, bot: 0, meCorrect: 0, botCorrect: 0, total: questions.length };
+  $('me-score').textContent = '0';
+  $('bot-score').textContent = '0';
+  show('match');
+
+  for (let i = 0; i < questions.length; i++) {
+    const round = makeRound(questions[i]);
+    const k = Scoring.multiplier(i, questions.length);
+    const isFinal = k > 1;
+    $('counter').textContent = isFinal ? 'Фінал ×2' : `${i + 1}/${questions.length}`;
+    $('counter').classList.toggle('final', isFinal);
+    $('me-tick').classList.add('hidden');
+    $('bot-tick').classList.add('hidden');
+    setTimer(MatchRules.questionTime);
+
+    if (isFinal) {
+      $('banner').classList.remove('hidden');
+      await sleep(MatchRules.finalBannerDuration * 1000);
+      $('banner').classList.add('hidden');
+      if (!alive()) return;
+    }
+
+    renderRound(round);
+    await sleep(MatchRules.promptLeadIn * 1000);
+    if (!alive()) return;
+
+    // --- відповіді ---
+    const answers = await new Promise(resolve => {
+      const start = performance.now();
+      const res = { me: null, bot: null };
+      const plan = botPlan(round);
+      const botWillAnswer = plan.delay < MatchRules.questionTime;
+      let botTimer = null, raf = null, done = false;
+
+      const finish = () => {
+        if (done) return;
+        done = true;
+        cancelAnimationFrame(raf);
+        clearTimeout(botTimer);
+        resolve(res);
+      };
+      const checkDone = () => { if (res.me && (res.bot || !botWillAnswer)) finish(); };
+
+      renderOptions(round, idx => {
+        if (res.me || done) return;
+        const left = MatchRules.questionTime - (performance.now() - start) / 1000;
+        if (left <= 0) return;
+        res.me = { optionIndex: idx, timeLeft: left };
+        $('options').children[idx].classList.add('picked');
+        for (const b of $('options').children) b.disabled = true;
+        $('me-tick').classList.remove('hidden');
+        checkDone();
+      });
+
+      if (botWillAnswer) {
+        botTimer = setTimeout(() => {
+          res.bot = { optionIndex: plan.optionIndex, timeLeft: MatchRules.questionTime - plan.delay };
+          $('bot-tick').classList.remove('hidden');
+          checkDone();
+        }, plan.delay * 1000);
+      }
+
+      const frame = () => {
+        if (!alive()) { finish(); return; }
+        const left = MatchRules.questionTime - (performance.now() - start) / 1000;
+        setTimer(left);
+        if (left <= 0) finish(); else raf = requestAnimationFrame(frame);
+      };
+      raf = requestAnimationFrame(frame);
+    });
+    if (!alive()) return;
+
+    // --- очки й розкриття ---
+    const meOk = answers.me?.optionIndex === round.correctIndex;
+    const botOk = answers.bot?.optionIndex === round.correctIndex;
+    const mePts = Scoring.points(meOk, answers.me?.timeLeft, k);
+    const botPts = Scoring.points(botOk, answers.bot?.timeLeft, k);
+    st.me += mePts; st.bot += botPts;
+    if (meOk) st.meCorrect++;
+    if (botOk) st.botCorrect++;
+
+    const btns = [...$('options').children];
+    btns.forEach((b, idx) => {
+      b.disabled = true;
+      b.classList.remove('picked');
+      const marks = b.querySelector('.marks');
+      if (answers.me?.optionIndex === idx) marks.insertAdjacentHTML('beforeend', '<span>🎬</span>');
+      if (answers.bot?.optionIndex === idx) marks.insertAdjacentHTML('beforeend', `<span>${BotConfig.avatar}</span>`);
+      if (idx === round.correctIndex) b.classList.add('correct');
+      else if (answers.me?.optionIndex === idx || answers.bot?.optionIndex === idx) b.classList.add('wrong');
+      else b.classList.add('dim');
+    });
+    $('me-score').textContent = st.me;
+    $('bot-score').textContent = st.bot;
+    floatGain($('me-score'), mePts);
+    floatGain($('bot-score'), botPts);
+
+    await sleep(MatchRules.revealDuration * 1000);
+    if (!alive()) return;
+  }
+
+  showResult(st);
+}
+
+function showResult(st) {
+  const outcome = decideOutcome(st.me, st.bot, st.meCorrect, st.botCorrect);
+  const text = { win: ['🏆', 'Перемога!'], loss: ['😤', 'Поразка'], draw: ['🤝', 'Нічия'] }[outcome];
+  $('verdict-emoji').textContent = text[0];
+  $('verdict').textContent = text[1];
+  $('verdict').className = `verdict ${outcome}`;
+  const fill = (id, pts, correct, isWinner) => {
+    $(id).querySelector('.pts').textContent = pts;
+    $(id).querySelector('.cr').textContent = `${correct} з ${st.total} правильно`;
+    $(id).classList.toggle('winner', isWinner);
+  };
+  fill('res-me', st.me, st.meCorrect, outcome === 'win');
+  fill('res-bot', st.bot, st.botCorrect, outcome === 'loss');
+  show('result');
+}
+
+async function init() {
+  for (const id of ['home-bot-ava', 'bot-ava']) $(id).textContent = BotConfig.avatar;
+  for (const id of ['home-bot-name', 'bot-name']) $(id).textContent = BotConfig.name;
+  $('res-bot').querySelector('.ava').textContent = BotConfig.avatar;
+  $('res-bot').querySelector('.nm').textContent = BotConfig.name;
+
+  renderLengthPicker();
+  $('play').onclick = playMatch;
+  $('rematch').onclick = playMatch;
+  $('to-home').onclick = () => { matchToken++; show('home'); };
+
+  fitToWindow();
+  addEventListener('resize', fitToWindow);
+  tickClock();
+  setInterval(tickClock, 10000);
+
+  try {
+    const r = await fetch('../KinoBattleApp/questions.json', { cache: 'no-store' });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    bank = await r.json();
+  } catch (e) {
+    $('home').innerHTML = `<div class="error"><b>Не вдалося завантажити questions.json</b>
+      Запусти сервер з кореня репозиторію (VS Code: завдання «Preview: запустити сервер»)
+      і відкрий http://localhost:5180/preview/<br><br>${e.message}</div>`;
+  }
+}
+init();
+</script>
+</body>
+</html>

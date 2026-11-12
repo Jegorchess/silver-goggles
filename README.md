@@ -1,6 +1,6 @@
 # KinoBattleApp — кіно-квіз батл для iOS (у розробці)
 
-Дуель 1 на 1 проти бота: 7 питань про кіно, 10 секунд на кожне, 4 варіанти,
+Дуель 1 на 1 проти бота: 7 або 14 питань про кіно (і його історію), 10 секунд на кожне, 4 варіанти,
 більше очок за швидку відповідь, фінальне питання ×2.
 
 Рішення для MVP (відрізняються від початкової специфікації):
@@ -21,6 +21,26 @@
 - `MatchEngine` — перебіг матчу й таймер на монотонному годиннику;
 - екрани: головний, матч, результат (реванш одним тапом);
 - `questions.json` зі стартовим набором питань;
-- проєкт Xcode й unit-тести.
+- проєкт Xcode (рушій підключається як локальний пакет).
 
-Код ще не компілювався: на сервері, де його писали, немає Swift.
+## Збірка й тести рушія
+
+Рушій оформлено як Swift-пакет `KinoBattleEngine` (`Package.swift`), тести — у `Tests/KinoBattleEngineTests/`.
+
+На Mac: `swift test` або відкрити `Package.swift` у Xcode.
+
+На Windows/Linux через Docker (Swift ставити не треба):
+
+```sh
+docker run --rm -v "${PWD}:/src" -w /src swift:6.0 swift test --scratch-path /tmp/build
+```
+
+Сам iOS-застосунок збирається й запускається лише на Mac з Xcode.
+
+## Превʼю на Windows (у VS Code)
+
+`preview/index.html` — інтерактивний макет гри в рамці iPhone. Логіка — порт `Engine/` на JS,
+питання — з того самого `KinoBattleApp/questions.json`. Якщо змінюєш правила у Swift, онови й превʼю.
+
+1. `Ctrl+Shift+P` → **Tasks: Run Task** → **Preview: запустити сервер** (або `python -m http.server 5180`).
+2. `Ctrl+Shift+P` → **Simple Browser: Show** → `http://localhost:5180/preview/`.

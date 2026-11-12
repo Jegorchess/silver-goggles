@@ -1,7 +1,10 @@
 import Foundation
 
 enum MatchRules {
+    /// Довжина матчу за замовчуванням.
     static let questionsPerMatch = 7
+    /// Доступні довжини матчу (гравець обирає на головному екрані).
+    static let matchLengths = [7, 14]
     /// Час на відповідь, с.
     static let questionTime: Double = 10
     /// Пауза між появою питання і варіантів, с.

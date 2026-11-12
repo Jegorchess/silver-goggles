@@ -1,0 +1,21 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Preview: запустити сервер",
+      "detail": "Відкрий http://localhost:5180/preview/ у Simple Browser (Ctrl+Shift+P → Simple Browser: Show)",
+      "type": "shell",
+      "command": "python -m http.server 5180 --bind 127.0.0.1",
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": { "reveal": "silent", "panel": "dedicated" }
+    },
+    {
+      "label": "Engine: тести (Docker)",
+      "type": "shell",
+      "command": "docker run --rm -v \"${workspaceFolder}:/src\" -w /src swift:6.0 swift test --scratch-path /tmp/build",
+      "group": "test",
+      "problemMatcher": []
+    }
+  ]
+}
