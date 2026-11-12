@@ -61,6 +61,10 @@ CREATE TABLE IF NOT EXISTS matches (
 );
 CREATE INDEX IF NOT EXISTS matches_a ON matches(a_id, created_at);
 CREATE INDEX IF NOT EXISTS matches_b ON matches(b_id, created_at);
+CREATE TABLE IF NOT EXISTS photos (
+  account_id INTEGER PRIMARY KEY REFERENCES accounts(id) ON DELETE CASCADE,
+  data BLOB NOT NULL
+);
 CREATE TABLE IF NOT EXISTS friendships (
   requester_id INTEGER NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
   addressee_id INTEGER NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
@@ -84,6 +88,11 @@ CREATE VIEW IF NOT EXISTS player_matches AS
 
 const sha256 = s => crypto.createHash('sha256').update(s).digest('hex');
 
+/** Адреса фото з версією: після заміни URL змінюється, тож старе фото не застрягає в кеші. */
+function photoUrl(acc) {
+  return acc && acc.photo_version ? `/api/photos/${acc.id}?v=${acc.photo_version}` : null;
+}
+
 /** Зміна рейтингу Elo для гравця A (для B — з протилежним знаком). */
 function eloDelta(ratingA, ratingB, outcomeA) {
   const expected = 1 / (1 + 10 ** ((ratingB - ratingA) / 400));
@@ -98,6 +107,13 @@ class Store {
     this.db.exec('PRAGMA foreign_keys = ON;');
     if (file !== ':memory:') this.db.exec('PRAGMA journal_mode = WAL;');
     this.db.exec(SCHEMA);
+    this.migrate();
+  }
+
+  /** Додає колонки, яких не було в старих базах. */
+  migrate() {
+    const cols = this.db.prepare('PRAGMA table_info(accounts)').all().map(c => c.name);
+    if (!cols.includes('photo_version')) this.db.exec('ALTER TABLE accounts ADD COLUMN photo_version INTEGER');
   }
 
   q(sql) {
@@ -166,6 +182,29 @@ class Store {
   /** Видалення акаунта (вимога App Store). Матчі лишаються в історії суперників під збереженим імʼям. */
   deleteAccount(id) {
     this.q('DELETE FROM accounts WHERE id = ?').run(id);
+  }
+
+  // ===== Фото профілю =====
+
+  setPhoto(id, data) {
+    this.tx(() => {
+      this.q(`INSERT INTO photos (account_id, data) VALUES (?, ?)
+              ON CONFLICT(account_id) DO UPDATE SET data = excluded.data`).run(id, data);
+      this.q('UPDATE accounts SET photo_version = ? WHERE id = ?').run(Date.now(), id);
+    });
+    return this.getAccount(id);
+  }
+
+  getPhoto(id) {
+    return this.q('SELECT data FROM photos WHERE account_id = ?').get(id)?.data || null;
+  }
+
+  deletePhoto(id) {
+    this.tx(() => {
+      this.q('DELETE FROM photos WHERE account_id = ?').run(id);
+      this.q('UPDATE accounts SET photo_version = NULL WHERE id = ?').run(id);
+    });
+    return this.getAccount(id);
   }
 
   // ===== Сесії =====
@@ -283,7 +322,7 @@ class Store {
 
   /** Лише зареєстровані, що зіграли хоч один рейтинговий матч. */
   leaderboard(limit = 50) {
-    return this.q(`SELECT a.id, a.name, a.rating,
+    return this.q(`SELECT a.id, a.name, a.rating, a.photo_version,
                      (SELECT COUNT(*) FROM player_matches pm WHERE pm.me = a.id AND pm.rated = 1) AS games
                    FROM accounts a
                    WHERE a.email IS NOT NULL
@@ -343,14 +382,14 @@ class Store {
   }
 
   friends(meId) {
-    const rows = this.q(`SELECT f.requester_id, f.addressee_id, f.status, a.id, a.name, a.rating
+    const rows = this.q(`SELECT f.requester_id, f.addressee_id, f.status, a.id, a.name, a.rating, a.photo_version
                          FROM friendships f
                          JOIN accounts a ON a.id = CASE WHEN f.requester_id = ? THEN f.addressee_id ELSE f.requester_id END
                          WHERE f.requester_id = ? OR f.addressee_id = ?
                          ORDER BY a.name COLLATE NOCASE`).all(meId, meId, meId);
     const out = { friends: [], incoming: [], outgoing: [] };
     for (const r of rows) {
-      const person = { id: r.id, name: r.name, rating: r.rating };
+      const person = { id: r.id, name: r.name, rating: r.rating, photo: photoUrl(r) };
       if (r.status === 'accepted') out.friends.push(person);
       else if (r.addressee_id === meId) out.incoming.push(person);
       else out.outgoing.push(person);
@@ -359,4 +398,4 @@ class Store {
   }
 }
 
-module.exports = { Store, eloDelta, START_RATING, BOT_NAME };
+module.exports = { Store, eloDelta, photoUrl, START_RATING, BOT_NAME };

@@ -172,7 +172,7 @@ test('запрошення друга → рейтинговий матч → р
   const ratingA = await wa.next('rating');
   const ratingB = await wb.next('rating');
   assert.equal(ratingA.rated, true);
-  assert.equal(ratingA.delta, -ratingB.delta);
+  assert.equal(ratingA.delta + ratingB.delta, 0); // не `-x`: при нічиїй 0 і -0 — різні для strictEqual
   assert.equal(ratingA.rating + ratingB.rating, 2000);
   if (eb.outcome === 'win') assert.equal(ratingB.delta, 16);
 
@@ -213,6 +213,57 @@ test('матч гостя з зареєстрованим не рейтинго�
   assert.equal((await g.call('GET', '/me')).stats.human.played, 1);
   wg.close();
   wr.close();
+});
+
+/** Завантаження фото «сирим» тілом. */
+async function uploadPhoto(client, bytes, type = 'image/jpeg') {
+  const r = await fetch(srv.base + '/api/me/photo', {
+    method: 'POST',
+    headers: { 'Content-Type': type, Authorization: `Bearer ${client.token}` },
+    body: bytes,
+  });
+  return { status: r.status, ...(await r.json()) };
+}
+const fakeJpeg = (size = 2000) => Buffer.concat([Buffer.from([0xff, 0xd8, 0xff, 0xe0]), Buffer.alloc(size - 6, 7), Buffer.from([0xff, 0xd9])]);
+
+test('фото профілю: лише з акаунтом, лише JPEG, видно друзям і суперникам', async () => {
+  const g = apiClient(srv.base);
+  await g.guest('Гість-фото');
+  assert.equal((await uploadPhoto(g, fakeJpeg())).status, 403);
+
+  const { a, b, ra, rb } = await twoFriends('Photo', 'Viewer');
+  assert.equal((await uploadPhoto(a, Buffer.from('<svg onload=alert(1)>'), 'image/svg+xml')).status, 400);
+  assert.equal((await uploadPhoto(a, fakeJpeg(400 * 1024))).status, 413);
+
+  const jpeg = fakeJpeg();
+  const me = await uploadPhoto(a, jpeg);
+  assert.match(me.photo, new RegExp(`^/api/photos/${ra.me.id}\\?v=\\d+$`));
+  const r = await fetch(srv.base + me.photo);
+  assert.equal(r.status, 200);
+  assert.equal(r.headers.get('content-type'), 'image/jpeg');
+  assert.equal(r.headers.get('x-content-type-options'), 'nosniff');
+  assert.deepEqual(Buffer.from(await r.arrayBuffer()), jpeg);
+
+  // Друг бачить фото у списку, суперник — у матчі.
+  await a.call('POST', '/friends', { code: rb.me.friendCode });
+  await b.call('POST', '/friends', { code: ra.me.friendCode });
+  assert.equal((await b.call('GET', '/friends')).friends[0].photo, me.photo);
+  const wa = await wsClient(srv.base, { token: a.token });
+  const wb = await wsClient(srv.base, { token: b.token });
+  wa.send({ t: 'invite', friendId: rb.me.id, length: 7 });
+  const inv = await wb.next('invited');
+  assert.equal(inv.from.photo, me.photo);
+  wb.send({ t: 'inviteAccept', inviteId: inv.inviteId });
+  const sb = await wb.next('start');
+  assert.equal(sb.opponent.photo, me.photo);
+  assert.equal(sb.you.photo, null);
+  wa.close();
+  wb.close();
+
+  // Видалення фото.
+  const cleared = await a.call('DELETE', '/me/photo');
+  assert.equal(cleared.photo, null);
+  assert.equal((await fetch(srv.base + me.photo)).status, 404);
 });
 
 test('видалення акаунта', async () => {

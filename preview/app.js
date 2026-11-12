@@ -11,6 +11,27 @@
 const { MatchRules, Match, makeBot, pickQuestions, updateRecent } = window.KinoEngine;
 const $ = id => document.getElementById(id);
 
+/** Іконка зі спрайту в index.html. */
+const icon = name => `<svg class="i"><use href="#i-${name}"/></svg>`;
+
+/** Аватар: фото, або емодзі (місце в матчі), або перша літера імені на градієнті. */
+function setAvatar(el, { photo, name, emoji } = {}) {
+  el.textContent = '';
+  el.classList.remove('initial');
+  if (photo) {
+    const img = new Image();
+    img.alt = '';
+    img.onerror = () => setAvatar(el, { name, emoji });
+    img.src = photo;
+    el.appendChild(img);
+  } else if (emoji) {
+    el.textContent = emoji;
+  } else {
+    el.classList.add('initial');
+    el.textContent = ([...String(name || '?').trim()][0] || '?').toUpperCase();
+  }
+}
+
 // ===== Локальне збереження (лише зручності конкретного браузера) =====
 const store = {
   get(key, fallback) { try { const v = localStorage.getItem(key); return v == null ? fallback : JSON.parse(v); } catch { return fallback; } },
@@ -82,6 +103,7 @@ async function refreshMe() {
 // ===== Головний =====
 function renderChip() {
   if (!me) return;
+  setAvatar($('chip-ava'), { photo: me.photo, name: me.name });
   $('chip-name').textContent = me.name;
   const b = $('chip-badge');
   b.textContent = me.guest ? 'Гість' : `★ ${me.rating}`;
@@ -196,8 +218,7 @@ async function openProfile() {
   } catch (e) {
     return toast(e.message);
   }
-  $('profile-name').value = me.name;
-  $('profile-sub').textContent = me.guest ? 'Гість' : me.email;
+  renderProfileHead();
   $('profile-cta').classList.toggle('hidden', !me.guest);
   $('profile-actions').classList.toggle('hidden', me.guest);
   const s = me.stats;
@@ -226,7 +247,7 @@ async function openProfile() {
     for (const m of matches) {
       const delta = m.rated ? ` ${m.delta >= 0 ? '+' : ''}${m.delta}` : '';
       box.appendChild(row({
-        icon: m.mode === 'bot' ? '🍿' : '🎭',
+        icon: icon(m.mode === 'bot' ? 'bot' : 'user'),
         name: m.opp_name,
         sub: `${fmtDate(m.created_at)} · ${m.length} пит.${m.reason === 'opponentLeft' ? ' · суперник вийшов' : ''}`,
         side: `<div>${m.my_score} : ${m.opp_score}</div><div class="o ${m.outcome}">${OUTCOME[m.outcome]}${delta}</div>`,
@@ -237,12 +258,21 @@ async function openProfile() {
   }
 }
 
-/** Рядок списку. side — довірений HTML (лише числа й наші підписи); name/sub — як текст. */
-function row({ icon, rank, name, nameHtml, sub, side, me: isMe, actions }) {
+/**
+ * Рядок списку. icon/side — довірений HTML (наші іконки, числа й підписи);
+ * name/sub — як текст; avatar — { photo, name } гравця.
+ */
+function row({ icon: iconHtml, avatar, rank, name, nameHtml, sub, side, me: isMe, actions }) {
   const r = document.createElement('div');
   r.className = 'row' + (isMe ? ' me' : '');
   if (rank != null) r.insertAdjacentHTML('beforeend', `<div class="rank">${rank}</div>`);
-  if (icon) r.insertAdjacentHTML('beforeend', `<div class="ic">${icon}</div>`);
+  if (iconHtml) r.insertAdjacentHTML('beforeend', `<div class="ic">${iconHtml}</div>`);
+  if (avatar) {
+    const av = document.createElement('span');
+    av.className = 'av';
+    setAvatar(av, avatar);
+    r.appendChild(av);
+  }
   const main = document.createElement('div');
   main.className = 'main';
   main.innerHTML = '<div class="n"></div>';
@@ -260,12 +290,81 @@ function row({ icon, rank, name, nameHtml, sub, side, me: isMe, actions }) {
   return r;
 }
 
+function renderProfileHead() {
+  $('profile-name').value = me.name;
+  $('profile-sub').textContent = me.guest ? 'Гість' : me.email;
+  setAvatar($('profile-av'), { photo: me.photo, name: me.name });
+  $('profile-cam').innerHTML = icon(me.guest ? 'lock' : 'camera');
+  $('photo-remove').classList.toggle('hidden', !me.photo);
+}
+
+function pickPhoto() {
+  if (!me || me.guest) {
+    toast('Фото профілю — лише з акаунтом');
+    return;
+  }
+  $('photo-input').click();
+}
+
+/** Обрізає до квадрата по центру й зменшує до 256×256 JPEG — так фото важить кілька десятків КБ без EXIF/GPS. */
+async function preparePhoto(file) {
+  const bmp = await createImageBitmap(file);
+  const side = Math.min(bmp.width, bmp.height);
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = 256;
+  const ctx = canvas.getContext('2d');
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(bmp, (bmp.width - side) / 2, (bmp.height - side) / 2, side, side, 0, 0, 256, 256);
+  bmp.close?.();
+  return new Promise((resolve, reject) => canvas.toBlob(b => (b ? resolve(b) : reject(new Error('jpeg'))), 'image/jpeg', 0.85));
+}
+
+async function uploadPhoto(file) {
+  if (!file) return;
+  if (!file.type.startsWith('image/')) return toast('Обери зображення');
+  $('profile-ava').classList.add('busy');
+  try {
+    let blob;
+    try {
+      blob = await preparePhoto(file);
+    } catch {
+      throw new Error('Не вдалося відкрити це зображення');
+    }
+    const r = await fetch('/api/me/photo', {
+      method: 'POST',
+      headers: { 'Content-Type': 'image/jpeg', Authorization: `Bearer ${token}` },
+      body: blob,
+    });
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(data.error || 'Не вдалося завантажити фото');
+    me = data;
+    renderProfileHead();
+    renderChip();
+    toast('Фото оновлено');
+  } catch (e) {
+    toast(e.message);
+  } finally {
+    $('profile-ava').classList.remove('busy');
+    $('photo-input').value = '';
+  }
+}
+
+async function removePhoto() {
+  try {
+    me = await api('DELETE', '/me/photo');
+    renderProfileHead();
+    renderChip();
+  } catch (e) {
+    toast(e.message);
+  }
+}
+
 async function saveName() {
   const name = $('profile-name').value;
   if (!me || name.trim() === me.name) return;
   try {
     me = await api('PATCH', '/me', { name });
-    $('profile-name').value = me.name;
+    renderProfileHead();
     renderChip();
     toast('Імʼя збережено');
   } catch (e) {
@@ -316,6 +415,7 @@ async function openLeaders() {
     lb.top.forEach((p, i) => {
       box.appendChild(row({
         rank: ['🥇', '🥈', '🥉'][i] || i + 1,
+        avatar: { photo: p.photo, name: p.name },
         name: p.name,
         sub: `${p.games} ${p.games === 1 ? 'матч' : 'матчів'}`,
         side: `<div style="font-weight:800">★ ${p.rating}</div>`,
@@ -365,7 +465,7 @@ async function loadFriends() {
   inc.innerHTML = '';
   for (const p of f.incoming) {
     inc.appendChild(row({
-      icon: '👋', name: p.name, sub: `★ ${p.rating} · хоче дружити`,
+      avatar: p, name: p.name, sub: `★ ${p.rating} · хоче дружити`,
       actions: [
         iconButton('✕', 'icon-btn', () => friendAction('DELETE', `/friends/${p.id}`), 'Відхилити'),
         iconButton('✓', 'icon-btn ok', () => friendAction('POST', `/friends/${p.id}/accept`), 'Прийняти'),
@@ -375,10 +475,11 @@ async function loadFriends() {
   const list = $('friends-list');
   list.innerHTML = f.friends.length ? '' : '<div class="empty">Поки нікого. Поділись своїм кодом або введи код друга.</div>';
   for (const p of f.friends) {
-    const invite = iconButton('⚔️ Позвати', 'btn small', () => inviteFriend(p));
+    const invite = iconButton('', 'btn small', () => inviteFriend(p));
+    invite.innerHTML = `${icon('swords')}Позвати`;
     invite.disabled = !p.online;
     list.appendChild(row({
-      icon: '🎬',
+      avatar: p,
       nameHtml: `<span class="online-dot${p.online ? ' on' : ''}"></span>`,
       name: p.name,
       sub: `★ ${p.rating} · ${p.online ? 'онлайн' : 'не в мережі'}`,
@@ -389,7 +490,7 @@ async function loadFriends() {
   out.innerHTML = '';
   for (const p of f.outgoing) {
     out.appendChild(row({
-      icon: '⏳', name: p.name, sub: 'Запит надіслано',
+      avatar: p, name: p.name, sub: 'Запит надіслано',
       actions: [iconButton('✕', 'icon-btn', () => friendAction('DELETE', `/friends/${p.id}`), 'Скасувати')],
     }));
   }
@@ -503,6 +604,7 @@ function onDisconnect() {
 // ===== Запрошення від друга =====
 function showInvite(msg) {
   pendingInvite = msg;
+  setAvatar($('invite-av'), { photo: msg.from.photo, name: msg.from.name });
   $('invite-title').textContent = `${msg.from.name} кличе на дуель`;
   const inGame = visible('match') || visible('lobby');
   $('invite-desc').textContent = `Матч на ${msg.length} питань.` + (inGame ? ' Поточна гра завершиться.' : '');
@@ -631,14 +733,16 @@ const handlers = {
     clearUi();
     ui.total = m.total;
     ui.opponentIsBot = m.opponent.isBot;
-    $('me-ava').textContent = m.you.avatar;
+    ui.you = m.you;
+    ui.opp = m.opponent;
+    setAvatar($('me-ava'), { photo: m.you.photo, emoji: m.you.avatar });
     $('me-name').textContent = 'Ти';
-    $('opp-ava').textContent = m.opponent.avatar;
+    setAvatar($('opp-ava'), { photo: m.opponent.photo, emoji: m.opponent.avatar });
     $('opp-name').textContent = m.opponent.name;
     $('me-score').textContent = '0';
     $('opp-score').textContent = '0';
     for (const [col, p, nm] of [['res-me', m.you, 'Ти'], ['res-opp', m.opponent, m.opponent.name]]) {
-      $(col).querySelector('.ava').textContent = p.avatar;
+      setAvatar($(col).querySelector('.ava'), { photo: p.photo, emoji: p.avatar });
       $(col).querySelector('.nm').textContent = nm;
     }
     $('options').innerHTML = '';
@@ -712,8 +816,13 @@ const handlers = {
       b.disabled = true;
       b.classList.remove('picked');
       const marks = b.querySelector('.marks');
-      if (m.you.option === i) marks.insertAdjacentHTML('beforeend', `<span>${$('me-ava').textContent}</span>`);
-      if (m.opponent.option === i) marks.insertAdjacentHTML('beforeend', `<span>${$('opp-ava').textContent}</span>`);
+      const mark = p => {
+        const s = document.createElement('span');
+        setAvatar(s, { photo: p.photo, emoji: p.avatar });
+        marks.appendChild(s);
+      };
+      if (m.you.option === i) mark(ui.you);
+      if (m.opponent.option === i) mark(ui.opp);
       if (i === m.correctIndex) b.classList.add('correct');
       else if (m.you.option === i || m.opponent.option === i) b.classList.add('wrong');
       else b.classList.add('dim');
@@ -785,7 +894,7 @@ const handlers = {
       n.className = 'rating-note';
       n.innerHTML = `Рейтинг: ★ ${m.rating} <span class="${m.delta >= 0 ? 'up' : 'down'}">(${m.delta >= 0 ? '+' : ''}${m.delta})</span>`;
     } else if (m.why === 'guest') {
-      setRatingNote('🔒 Гості не отримують рейтинг', true);
+      setRatingNote('Гості не отримують рейтинг', true);
     } else {
       $('rating-note').className = 'rating-note soft';
       $('rating-note').textContent = 'Суперник — гість, тож матч без рейтингу';
@@ -815,7 +924,7 @@ function setRatingNote(text, withCta) {
   $('rating-note').className = 'rating-note soft';
   $('rating-note').textContent = text;
   $('result-cta').classList.toggle('hidden', !(withCta && me?.guest));
-  if (withCta && me?.guest) $('rating-note').textContent = '🔒 Гості не потрапляють у рейтинг';
+  if (withCta && me?.guest) $('rating-note').innerHTML = `${icon('lock')}Гості не потрапляють у рейтинг`;
 }
 
 function onMessage(msg) {
@@ -899,6 +1008,9 @@ async function init() {
 
   $('profile-name').addEventListener('change', saveName);
   $('profile-name').addEventListener('keydown', e => { if (e.key === 'Enter') e.target.blur(); });
+  $('profile-ava').onclick = pickPhoto;
+  $('photo-input').addEventListener('change', e => uploadPhoto(e.target.files[0]));
+  $('photo-remove').onclick = removePhoto;
   $('logout').onclick = logout;
   $('delete-account').onclick = deleteAccount;
 

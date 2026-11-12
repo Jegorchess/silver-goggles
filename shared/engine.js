@@ -177,7 +177,7 @@
     }
 
     publicInfo(p) {
-      return { name: p.name, avatar: p.avatar, isBot: !!p.isBot };
+      return { name: p.name, avatar: p.avatar, photo: p.photo || null, isBot: !!p.isBot };
     }
 
     start() {

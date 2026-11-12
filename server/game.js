@@ -6,6 +6,7 @@
 
 const { WebSocketServer, WebSocket } = require('ws');
 const E = require('../shared/engine.js');
+const { photoUrl } = require('./db.js');
 
 const HUMAN_AVATARS = ['🎬', '🎭'];
 const MAX_NAME = 24;
@@ -26,6 +27,7 @@ class Client {
     this.ws = ws;
     this.name = 'Гравець';
     this.accountId = null;
+    this.photo = null;
     this.room = null;
     this.queuedFor = null;
     this.alive = true;
@@ -84,11 +86,14 @@ function createGame({ server, bank, store, timeScale = 1 }) {
     return client.queuedFor != null || (client.room?.match && client.room.match.state !== 'ended');
   }
 
-  /** Актуальне імʼя з акаунта (його могли змінити в профілі). */
+  /** Актуальні імʼя й фото з акаунта (їх могли змінити в профілі). */
   function refreshName(client) {
     if (store && client.accountId) {
       const acc = store.getAccount(client.accountId);
-      if (acc) client.name = acc.name;
+      if (acc) {
+        client.name = acc.name;
+        client.photo = photoUrl(acc);
+      }
     }
   }
 
@@ -101,6 +106,7 @@ function createGame({ server, bank, store, timeScale = 1 }) {
     const players = clients.map((c, seat) => ({
       name: c.name,
       avatar: HUMAN_AVATARS[seat],
+      photo: c.photo,
       send: msg => c.send(msg),
     }));
     const match = new E.Match({ questions, players, timeScale });
@@ -168,7 +174,7 @@ function createGame({ server, bank, store, timeScale = 1 }) {
       if (!acc) return client.send({ t: 'authError' });
       if (client.accountId && client.accountId !== acc.id) online.get(client.accountId)?.delete(client);
       client.accountId = acc.id;
-      client.name = acc.name;
+      refreshName(client);
       if (!online.has(acc.id)) online.set(acc.id, new Set());
       online.get(acc.id).add(client);
       client.send({ t: 'authed', id: acc.id });
@@ -237,7 +243,7 @@ function createGame({ server, bank, store, timeScale = 1 }) {
       room.invite = { id, to: target };
       invites.set(id, room);
       client.send({ t: 'inviteSent', inviteId: id, friend: { id: friendId, name: store.getAccount(friendId)?.name } });
-      target.send({ t: 'invited', inviteId: id, from: { id: client.accountId, name: client.name }, length: room.length });
+      target.send({ t: 'invited', inviteId: id, from: { id: client.accountId, name: client.name, photo: client.photo }, length: room.length });
     },
 
     inviteAccept(client, msg) {
@@ -336,9 +342,9 @@ function createGame({ server, bank, store, timeScale = 1 }) {
   return {
     wss,
     isOnline: accountId => !!onlineClient(accountId),
-    /** Перейменування в профілі — оновлюємо імʼя у відкритих зʼєднаннях. */
-    renamed(accountId, name) {
-      for (const c of online.get(accountId) || []) c.name = name;
+    /** Змінили імʼя чи фото в профілі — оновлюємо відкриті зʼєднання. */
+    profileChanged(accountId) {
+      for (const c of online.get(accountId) || []) refreshName(c);
     },
     /** Видалення акаунта — відключаємо його зʼєднання. */
     dropAccount(accountId) {

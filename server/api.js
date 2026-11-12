@@ -7,31 +7,42 @@
 const E = require('../shared/engine.js');
 const { AuthError } = require('./auth.js');
 const { cleanName } = require('./game.js');
+const { photoUrl } = require('./db.js');
 
 const MAX_BODY = 4 * 1024;
+/** Клієнт сам зменшує фото до 256×256 JPEG (~20–60 КБ); з запасом. */
+const MAX_PHOTO = 300 * 1024;
 
-function readJson(req) {
+/**
+ * Читає тіло запиту до `limit` байтів. Якщо більше — дочитуємо й відкидаємо решту (щоб клієнт
+ * отримав нормальну відповідь 413, а не обірване зʼєднання), але не далі за 4×limit.
+ */
+function readRaw(req, limit, message = 'Завеликий запит') {
   return new Promise((resolve, reject) => {
     let size = 0;
     const chunks = [];
     req.on('data', c => {
       size += c.length;
-      if (size > MAX_BODY) {
-        reject(new AuthError(413, 'Завеликий запит'));
-        req.destroy();
-      } else chunks.push(c);
+      if (size <= limit) chunks.push(c);
+      else if (size > limit * 4) req.destroy();
     });
-    req.on('end', () => {
-      if (!chunks.length) return resolve({});
-      try {
-        const v = JSON.parse(Buffer.concat(chunks).toString('utf8'));
-        resolve(v && typeof v === 'object' ? v : {});
-      } catch {
-        reject(new AuthError(400, 'Некоректний JSON'));
-      }
-    });
+    req.on('end', () => (size > limit ? reject(new AuthError(413, message)) : resolve(Buffer.concat(chunks))));
+    req.on('close', () => { if (size > limit) reject(new AuthError(413, message)); });
     req.on('error', reject);
   });
+}
+
+const isJpeg = b => b.length > 4 && b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff;
+
+async function readJson(req) {
+  const buf = await readRaw(req, MAX_BODY);
+  if (!buf.length) return {};
+  try {
+    const v = JSON.parse(buf.toString('utf8'));
+    return v && typeof v === 'object' ? v : {};
+  } catch {
+    throw new AuthError(400, 'Некоректний JSON');
+  }
 }
 
 function send(res, status, data) {
@@ -62,6 +73,7 @@ function createApi({ store, auth, game }) {
       guest: !acc.email,
       email: acc.email,
       friendCode: acc.friend_code,
+      photo: photoUrl(acc),
       rating: acc.email ? acc.rating : null,
       rank: store.rank(acc.id),
       stats: store.stats(acc.id),
@@ -130,7 +142,7 @@ function createApi({ store, auth, game }) {
       const acc = requireAccount(req);
       const { name } = await readJson(req);
       const updated = store.rename(acc.id, cleanName(name));
-      game.renamed(acc.id, updated.name);
+      game.profileChanged(acc.id);
       return profile(updated);
     },
 
@@ -139,6 +151,25 @@ function createApi({ store, auth, game }) {
       game.dropAccount(acc.id);
       store.deleteAccount(acc.id);
       return { deleted: true };
+    },
+
+    /** Фото профілю: тіло — JPEG (клієнт уже обрізав і зменшив). Лише для зареєстрованих. */
+    'POST /api/me/photo': async req => {
+      const acc = store.accountForToken(bearer(req));
+      if (!acc) throw new AuthError(401, 'Потрібно увійти');
+      if (!acc.email) throw new AuthError(403, 'Фото профілю — лише з акаунтом');
+      const data = await readRaw(req, MAX_PHOTO, 'Фото завелике');
+      if (!isJpeg(data)) throw new AuthError(400, 'Потрібне зображення JPEG');
+      const updated = store.setPhoto(acc.id, data);
+      game.profileChanged(acc.id);
+      return profile(updated);
+    },
+
+    'DELETE /api/me/photo': async req => {
+      const acc = requireAccount(req);
+      const updated = store.deletePhoto(acc.id);
+      game.profileChanged(acc.id);
+      return profile(updated);
     },
 
     'GET /api/me/history': async req => ({ matches: store.history(requireAccount(req).id, 30) }),
@@ -160,7 +191,7 @@ function createApi({ store, auth, game }) {
     'GET /api/leaderboard': async req => {
       const acc = store.accountForToken(bearer(req));
       return {
-        top: store.leaderboard(50).map(r => ({ id: r.id, name: r.name, rating: r.rating, games: r.games })),
+        top: store.leaderboard(50).map(r => ({ id: r.id, name: r.name, rating: r.rating, games: r.games, photo: photoUrl(r) })),
         me: acc ? { id: acc.id, guest: !acc.email, rating: acc.email ? acc.rating : null, rank: store.rank(acc.id) } : null,
       };
     },
@@ -199,8 +230,31 @@ function createApi({ store, auth, game }) {
   }
 
   /** @returns {Promise<boolean>} чи оброблено запит */
+  /** Віддає фото (публічно — його бачать суперники, друзі й таблиця лідерів). */
+  function servePhoto(res, id) {
+    const data = store.getPhoto(id);
+    if (!data) {
+      send(res, 404, { error: 'Фото немає' });
+      return;
+    }
+    res.writeHead(200, {
+      'Content-Type': 'image/jpeg',
+      'Content-Length': data.length,
+      // URL містить ?v=<версія>, тож можна кешувати назавжди.
+      'Cache-Control': 'public, max-age=31536000, immutable',
+      'X-Content-Type-Options': 'nosniff',
+      'Content-Security-Policy': "default-src 'none'",
+    });
+    res.end(Buffer.from(data));
+  }
+
   return async function handle(req, res, url) {
     if (!url.pathname.startsWith('/api/')) return false;
+    const photo = /^\/api\/photos\/(\d+)$/.exec(url.pathname);
+    if (photo && req.method === 'GET') {
+      servePhoto(res, Number(photo[1]));
+      return true;
+    }
     try {
       let data;
       const route = routes[`${req.method} ${url.pathname}`];

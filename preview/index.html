@@ -117,7 +117,6 @@
   #home { justify-content: space-between; text-align: center; }
   .topbar { display: flex; justify-content: flex-end; }
   .me-chip { display: flex; align-items: center; gap: 8px; padding: 6px 12px 6px 6px; border-radius: 22px; background: var(--card); font-size: 15px; font-weight: 600; max-width: 100%; }
-  .me-chip .ava { width: 30px; height: 30px; border-radius: 50%; background: var(--card-hi); display: grid; place-items: center; font-size: 16px; flex: none; }
   .me-chip .nm { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px; }
   .badge { font-size: 12px; font-weight: 700; padding: 3px 8px; border-radius: 10px; background: var(--card-hi); color: var(--muted); white-space: nowrap; }
   .badge.rating { background: rgba(255, 201, 77, .15); color: var(--gold); }
@@ -140,7 +139,6 @@
 
   /* Профіль */
   .profile-head { display: flex; align-items: center; gap: 14px; margin-top: 10px; }
-  .profile-head .ava { width: 64px; height: 64px; border-radius: 50%; background: var(--card); display: grid; place-items: center; font-size: 32px; flex: none; }
   .profile-head .name-field { font-size: 19px; font-weight: 800; padding: 8px 10px; margin-left: -10px; background: transparent; }
   .profile-head .name-field:focus { background: var(--card); }
   .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
@@ -285,11 +283,82 @@
   .sheet .btns { display: flex; gap: 10px; margin-top: 18px; }
   .toast { position: absolute; top: 62px; left: 50%; transform: translateX(-50%); z-index: 26; max-width: 330px; padding: 10px 16px; border-radius: 14px; background: var(--card-hi); font-size: 14px; font-weight: 600; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,.4); animation: pop .25s ease-out; }
 
+  /* Іконки (спрайт нижче): лінія 2px + напівпрозора заливка основної форми; колір — від тексту. */
+  .i { width: 20px; height: 20px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; vertical-align: -4px; }
+  .i .d { fill: currentColor; fill-opacity: .2; }
+  .i .f { fill: currentColor; stroke: none; }
+  .btn .i { margin-right: 7px; }
+  .i.lg { width: 48px; height: 48px; stroke-width: 1.6; }
+  .cta .t .i { width: 18px; height: 18px; margin-right: 4px; color: var(--gold); vertical-align: -3px; }
+  .rating-note .i { width: 16px; height: 16px; vertical-align: -3px; margin-right: 2px; }
+
+  /* Аватари: фото або перша літера імені */
+  .av { position: relative; display: grid; place-items: center; border-radius: 50%; overflow: hidden; background: var(--card-hi); flex: none; }
+  .av img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .av.initial { background: linear-gradient(135deg, var(--accent), #ff8a45); color: #fff; font-weight: 800; }
+  .row .av { width: 38px; height: 38px; font-size: 16px; }
+  .me-chip .av { width: 30px; height: 30px; font-size: 14px; }
+  .profile-ava { position: relative; width: 72px; height: 72px; flex: none; cursor: pointer; padding: 0; background: none; border-radius: 50%; }
+  .profile-ava .av { width: 72px; height: 72px; font-size: 30px; }
+  .profile-ava .cam {
+    position: absolute; right: -2px; bottom: -2px; width: 28px; height: 28px; border-radius: 50%;
+    background: var(--accent); color: #fff; display: grid; place-items: center; box-shadow: 0 0 0 3px var(--screen);
+  }
+  .profile-ava .cam .i { width: 15px; height: 15px; vertical-align: 0; }
+  .profile-ava.busy .av { opacity: .4; }
+  .photo-link { background: none; color: var(--muted); font-size: 13px; padding: 2px 0; text-decoration: underline; }
+  #me-ava, #opp-ava { width: 100%; height: 100%; display: grid; place-items: center; border-radius: 50%; overflow: hidden; }
+  #me-ava img, #opp-ava img, .final-scores .ava img, .opt .marks img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
+  .final-scores .ava { width: 56px; height: 56px; margin: 0 auto; display: grid; place-items: center; }
+
   .error { margin: auto; text-align: center; color: var(--muted); line-height: 1.5; }
   .error b { color: var(--bad); display: block; font-size: 18px; margin-bottom: 8px; }
 </style>
 </head>
 <body>
+<!-- Набір іконок KinoBattle (24×24). Використання: <svg class="i"><use href="#i-bot"/></svg> -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-bot" viewBox="0 0 24 24">
+      <rect class="d" x="4" y="8" width="16" height="12" rx="4"/>
+      <path d="M12 4.5V8M2.5 13v3M21.5 13v3M9.5 17h5"/>
+      <circle class="f" cx="12" cy="3.4" r="1.4"/>
+      <circle class="f" cx="9" cy="13.2" r="1.5"/><circle class="f" cx="15" cy="13.2" r="1.5"/>
+    </symbol>
+    <symbol id="i-user" viewBox="0 0 24 24">
+      <circle class="d" cx="12" cy="8" r="4"/>
+      <path class="d" d="M4 21c.6-4 4-6.5 8-6.5s7.4 2.5 8 6.5"/>
+    </symbol>
+    <symbol id="i-users" viewBox="0 0 24 24">
+      <circle class="d" cx="9" cy="8" r="3.5"/>
+      <path class="d" d="M2.5 20.5c.5-3.6 3.2-5.8 6.5-5.8s6 2.2 6.5 5.8"/>
+      <circle cx="17" cy="8.6" r="2.6"/>
+      <path d="M17.4 14.2c2.4.4 3.8 2.2 4.1 4.8"/>
+    </symbol>
+    <symbol id="i-trophy" viewBox="0 0 24 24">
+      <path class="d" d="M7 3.5h10v5.5a5 5 0 0 1-10 0z"/>
+      <path d="M7 5.5H4.5a3 3 0 0 0 3 4.8M17 5.5h2.5a3 3 0 0 1-3 4.8M12 14v3.5"/>
+      <path class="d" d="M8 21h8l-1-3.5H9z"/>
+    </symbol>
+    <symbol id="i-dice" viewBox="0 0 24 24">
+      <rect class="d" x="3.5" y="3.5" width="17" height="17" rx="4"/>
+      <circle class="f" cx="8.5" cy="8.5" r="1.4"/><circle class="f" cx="15.5" cy="8.5" r="1.4"/>
+      <circle class="f" cx="12" cy="12" r="1.4"/>
+      <circle class="f" cx="8.5" cy="15.5" r="1.4"/><circle class="f" cx="15.5" cy="15.5" r="1.4"/>
+    </symbol>
+    <symbol id="i-swords" viewBox="0 0 24 24">
+      <path d="M4 4l11 11M20 4L9 15M12.5 17.5l5-5M6.5 12.5l5 5M16.5 16.5L20 20M7.5 16.5L4 20"/>
+    </symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24">
+      <rect class="d" x="5" y="10.5" width="14" height="10.5" rx="3"/>
+      <path d="M8 10.5V8a4 4 0 0 1 8 0v2.5M12 14.8v2.4"/>
+    </symbol>
+    <symbol id="i-camera" viewBox="0 0 24 24">
+      <path class="d" d="M3.5 8.5A1.5 1.5 0 0 1 5 7h2.6l1.6-2.5h5.6L16.4 7H19a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 19 19H5a1.5 1.5 0 0 1-1.5-1.5z"/>
+      <circle cx="12" cy="12.8" r="3.3"/>
+    </symbol>
+  </defs>
+</svg>
 <div id="stage">
   <div class="phone">
     <div class="island"></div>
@@ -364,7 +433,7 @@
       <div>
         <div class="topbar">
           <button class="me-chip" id="me-chip">
-            <span class="ava">🎬</span><span class="nm" id="chip-name"></span><span class="badge" id="chip-badge"></span>
+            <span class="av" id="chip-ava"></span><span class="nm" id="chip-name"></span><span class="badge" id="chip-badge"></span>
           </button>
         </div>
         <div data-logo style="margin-top: 6px"></div>
@@ -379,12 +448,12 @@
       <div class="home-controls">
         <div class="segmented" id="length-picker"></div>
         <div class="play-row">
-          <button class="btn" id="play-bot">🍿 З ботом</button>
-          <button class="btn" id="play-online">🎭 З людиною</button>
+          <button class="btn" id="play-bot"><svg class="i"><use href="#i-bot"/></svg>З ботом</button>
+          <button class="btn" id="play-online"><svg class="i"><use href="#i-user"/></svg>З людиною</button>
         </div>
         <div class="play-row">
-          <button class="btn secondary" id="open-leaders">🏆 Рейтинг</button>
-          <button class="btn secondary" id="open-friends">👥 Друзі<span class="dot-badge hidden" id="friends-badge"></span></button>
+          <button class="btn secondary" id="open-leaders"><svg class="i"><use href="#i-trophy"/></svg>Рейтинг</button>
+          <button class="btn secondary" id="open-friends"><svg class="i"><use href="#i-users"/></svg>Друзі<span class="dot-badge hidden" id="friends-badge"></span></button>
         </div>
       </div>
     </section>
@@ -413,15 +482,20 @@
       <button class="back" data-back>‹ Назад</button>
       <div class="scroll">
         <div class="profile-head">
-          <div class="ava">🎬</div>
+          <button class="profile-ava" id="profile-ava" title="Змінити фото">
+            <span class="av" id="profile-av"></span>
+            <span class="cam" id="profile-cam"><svg class="i"><use href="#i-camera"/></svg></span>
+          </button>
+          <input type="file" id="photo-input" accept="image/*" hidden>
           <div style="min-width:0; flex:1">
             <input class="field name-field" id="profile-name" maxlength="24">
             <div class="muted" id="profile-sub" style="font-size:14px"></div>
+            <button class="photo-link hidden" id="photo-remove">Прибрати фото</button>
           </div>
         </div>
         <div class="card gold cta hidden" id="profile-cta">
-          <div class="t">🔒 Ти граєш як гість</div>
-          <div class="d">Створи акаунт — усі твої матчі збережуться, ти потрапиш у таблицю лідерів і зможеш грати з друзями.</div>
+          <div class="t"><svg class="i"><use href="#i-lock"/></svg>Ти граєш як гість</div>
+          <div class="d">Створи акаунт — усі твої матчі збережуться, ти потрапиш у таблицю лідерів, зможеш грати з друзями й поставити своє фото.</div>
           <button class="btn" data-upgrade>Створити акаунт</button>
         </div>
         <div class="section-title">Статистика</div>
@@ -442,7 +516,7 @@
       <div class="screen-sub">Рейтинг за матчі з людьми</div>
       <div class="scroll" style="margin-top: 14px">
         <div class="card gold cta hidden" id="leaders-cta" style="margin: 0 0 14px">
-          <div class="t">🔒 Гості не потрапляють у рейтинг</div>
+          <div class="t"><svg class="i"><use href="#i-lock"/></svg>Гості не потрапляють у рейтинг</div>
           <div class="d">Створи акаунт — і кожна перемога над іншим гравцем підніматиме тебе в цій таблиці.</div>
           <button class="btn" data-upgrade>Створити акаунт</button>
         </div>
@@ -457,7 +531,7 @@
       <div class="screen-title">Друзі</div>
       <div class="scroll" style="margin-top: 14px">
         <div class="card gold cta hidden" id="friends-cta" style="margin-top: 0">
-          <div class="t">🔒 Друзі — лише з акаунтом</div>
+          <div class="t"><svg class="i"><use href="#i-lock"/></svg>Друзі — лише з акаунтом</div>
           <div class="d">Додавай друзів за кодом і клич їх на дуель одним тапом — без кодів кімнат.</div>
           <button class="btn" data-upgrade>Створити акаунт</button>
         </div>
@@ -492,7 +566,7 @@
       <div class="screen-sub" id="lobby-sub"></div>
 
       <div class="lobby-menu" id="lobby-menu">
-        <button class="btn" id="quick">🎲 Випадковий суперник</button>
+        <button class="btn" id="quick"><svg class="i"><use href="#i-dice"/></svg>Випадковий суперник</button>
         <div class="divider">або з другом</div>
         <button class="btn secondary" id="create">Створити кімнату</button>
         <div class="join-row">
@@ -506,7 +580,7 @@
         <div class="wait-text" id="wait-text"></div>
         <div class="room-code hidden" id="room-code"></div>
         <div class="wait-hint" id="wait-hint"></div>
-        <button class="btn hidden" id="bot-instead">🍿 Зіграти з ботом</button>
+        <button class="btn hidden" id="bot-instead"><svg class="i"><use href="#i-bot"/></svg>Зіграти з ботом</button>
         <button class="btn secondary" id="cancel-wait">Скасувати</button>
       </div>
 
@@ -567,7 +641,7 @@
     <!-- Запрошення від друга -->
     <div class="modal hidden" id="invite-modal">
       <div class="sheet">
-        <div class="big">⚔️</div>
+        <div class="big"><span class="av" id="invite-av" style="width:64px;height:64px;margin:0 auto;font-size:26px"></span></div>
         <div class="t" id="invite-title"></div>
         <div class="d" id="invite-desc"></div>
         <div class="btns">

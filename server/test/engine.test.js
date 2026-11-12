@@ -129,7 +129,8 @@ test('вихід гравця посеред матчу — технічна п�
 test('бот відповідає сам', async () => {
   const human = scripted('Я', () => null);
   const bot = E.makeBot({ ...E.BotConfig, accuracy: 1, answerTime: [1, 1] });
-  await runMatch([human, bot], [q('a'), q('b')]);
+  // Масштаб більший за типовий: при 20 мс на питання відповідь бота може запізнитись під навантаженням.
+  await runMatch([human, bot], [q('a'), q('b')], 0.02);
   const end = human.log.at(-1);
   assert.equal(end.opponent.correct, 2);
   assert.ok(human.log.some(m => m.t === 'opponentAnswered'));
