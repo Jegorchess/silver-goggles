@@ -2,13 +2,32 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "Server: npm install",
+      "type": "shell",
+      "command": "npm install --no-audit --no-fund",
+      "options": { "cwd": "${workspaceFolder}/server" },
+      "problemMatcher": [],
+      "presentation": { "reveal": "silent" }
+    },
+    {
       "label": "Preview: запустити сервер",
       "detail": "Відкрий http://localhost:5180/preview/ у Simple Browser (Ctrl+Shift+P → Simple Browser: Show)",
       "type": "shell",
-      "command": "python -m http.server 5180 --bind 127.0.0.1",
+      "command": "node server.js",
+      "options": { "cwd": "${workspaceFolder}/server" },
+      "dependsOn": "Server: npm install",
       "isBackground": true,
       "problemMatcher": [],
       "presentation": { "reveal": "silent", "panel": "dedicated" }
+    },
+    {
+      "label": "Server: тести",
+      "type": "shell",
+      "command": "npm test",
+      "options": { "cwd": "${workspaceFolder}/server" },
+      "dependsOn": "Server: npm install",
+      "group": "test",
+      "problemMatcher": []
     },
     {
       "label": "Engine: тести (Docker)",

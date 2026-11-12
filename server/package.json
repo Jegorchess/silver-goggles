@@ -1,0 +1,17 @@
+{
+  "name": "kinobattle-server",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Онлайн-сервер KinoBattle: матчі 1 на 1 через WebSocket + роздача веб-превʼю",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test test/"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
+}
