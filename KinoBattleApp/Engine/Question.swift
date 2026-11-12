@@ -14,6 +14,8 @@ struct Question: Codable, Hashable, Identifiable {
     let prompt: String
     let options: [String]
     let correctIndex: Int
+    /// Цікавий факт або пояснення, яке показується після відповіді. Необовʼязкове.
+    let fact: String?
 }
 
 /// Питання в конкретному матчі: варіанти перемішані, індекс правильного перераховано.
@@ -25,6 +27,7 @@ struct RoundQuestion: Hashable, Identifiable {
     var id: String { question.id }
     var prompt: String { question.prompt }
     var type: Question.Kind { question.type }
+    var fact: String? { question.fact }
 
     init<G: RandomNumberGenerator>(_ question: Question, using rng: inout G) {
         let order = Array(question.options.indices).shuffled(using: &rng)

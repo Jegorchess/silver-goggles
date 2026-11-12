@@ -32,6 +32,12 @@ final class ScoringTests: XCTestCase {
         XCTAssertEqual(Scoring.points(isCorrect: true, timeLeft: 5, multiplier: 2), 1500)
     }
 
+    func testRevealDurationDependsOnFactLength() {
+        XCTAssertEqual(MatchRules.revealDuration(for: makeQuestion("a")), 3)
+        XCTAssertEqual(MatchRules.revealDuration(for: makeQuestion("a", fact: String(repeating: "x", count: 60))), 4)
+        XCTAssertEqual(MatchRules.revealDuration(for: makeQuestion("a", fact: String(repeating: "x", count: 160))), 5)
+    }
+
     func testLongMatchDoublesOnlyLastQuestion() {
         XCTAssertEqual(Scoring.multiplier(questionIndex: 6, totalQuestions: 14), 1)
         XCTAssertEqual(Scoring.multiplier(questionIndex: 13, totalQuestions: 14), 2)

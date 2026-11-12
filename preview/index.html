@@ -67,7 +67,20 @@
 
   /* Головний */
   #home { justify-content: space-between; text-align: center; }
-  .logo { margin-top: 60px; font-size: 80px; }
+  .logo {
+    margin: 48px auto 0; width: 116px; height: 116px; border-radius: 30px;
+    /* Світіння — того ж кольору, що кнопка «Грати» і слово «Battle» (--accent). */
+    --glow: rgba(255, 77, 109, .45);
+    --glow-strong: rgba(255, 77, 109, .65);
+    box-shadow: 0 14px 40px var(--glow), 0 0 0 1px rgba(255,255,255,.08);
+    animation: breathe 3.2s ease-in-out infinite;
+  }
+  .logo svg { display: block; width: 100%; height: 100%; }
+  @keyframes breathe {
+    0%, 100% { transform: translateY(0); box-shadow: 0 14px 40px var(--glow), 0 0 0 1px rgba(255,255,255,.08); }
+    50% { transform: translateY(-5px); box-shadow: 0 20px 56px var(--glow-strong), 0 0 0 1px rgba(255,255,255,.10); }
+  }
+  @media (prefers-reduced-motion: reduce) { .logo { animation: none; } }
   .title { font-size: 36px; font-weight: 800; letter-spacing: -.5px; margin-top: 8px; }
   .title span { color: var(--accent); }
   .subtitle { color: var(--muted); margin-top: 10px; font-size: 16px; line-height: 1.4; }
@@ -105,6 +118,19 @@
   .question .prompt { font-size: 24px; font-weight: 700; line-height: 1.3; }
   .question .prompt.emoji { font-size: 64px; letter-spacing: 6px; }
 
+  .fact {
+    position: relative; overflow: hidden; width: 100%; margin-top: 18px; padding: 14px 16px 16px;
+    border-radius: 16px; background: var(--card); text-align: left; cursor: pointer;
+    box-shadow: inset 0 0 0 1px rgba(255, 201, 77, .25);
+    animation: pop .3s ease-out both;
+  }
+  .fact .label { color: var(--gold); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; }
+  .fact .text { margin-top: 6px; font-size: 15px; line-height: 1.45; }
+  .fact .skip { margin-top: 8px; font-size: 12px; color: var(--muted); }
+  .fact .bar { position: absolute; left: 0; bottom: 0; height: 3px; width: 100%; background: var(--gold); transform-origin: left; }
+  .question.revealing .prompt { font-size: 19px; }
+  .question.revealing .prompt.emoji { font-size: 44px; }
+  .question.revealing .hint { display: none; }
   .options { display: flex; flex-direction: column; gap: 10px; min-height: 278px; }
   .opt {
     position: relative; text-align: left; padding: 17px 18px; border-radius: 16px;
@@ -160,7 +186,56 @@
 
     <section id="home" class="screen">
       <div>
-        <div class="logo">🎬</div>
+        <div class="logo" aria-hidden="true">
+          <!-- Логотип: хлопавка з блискавкою («кіно» + «батл»). Основа для майбутньої AppIcon. -->
+          <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="kb-bg" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#ff4d6d"/>
+                <stop offset=".55" stop-color="#ff7a45"/>
+                <stop offset="1" stop-color="#ffc94d"/>
+              </linearGradient>
+              <linearGradient id="kb-bolt" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#ffc94d"/>
+                <stop offset="1" stop-color="#ff4d6d"/>
+              </linearGradient>
+              <radialGradient id="kb-shine" cx=".3" cy=".1" r=".8">
+                <stop offset="0" stop-color="#fff" stop-opacity=".35"/>
+                <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+              </radialGradient>
+              <clipPath id="kb-clapper"><rect x="22" y="34" width="76" height="14" rx="4"/></clipPath>
+              <clipPath id="kb-band"><rect x="22" y="52" width="76" height="12"/></clipPath>
+            </defs>
+
+            <rect width="120" height="120" rx="30" fill="url(#kb-bg)"/>
+            <rect width="120" height="120" rx="30" fill="url(#kb-shine)"/>
+
+            <!-- Верхня планка хлопавки, трохи відкрита -->
+            <g transform="rotate(-15 22 50)">
+              <rect x="22" y="34" width="76" height="14" rx="4" fill="#fff"/>
+              <g clip-path="url(#kb-clapper)" fill="#1c1c28">
+                <polygon points="30,34 41,34 33,48 22,48"/>
+                <polygon points="52,34 63,34 55,48 44,48"/>
+                <polygon points="74,34 85,34 77,48 66,48"/>
+                <polygon points="96,34 107,34 99,48 88,48"/>
+              </g>
+            </g>
+
+            <!-- Корпус -->
+            <rect x="22" y="52" width="76" height="46" rx="8" fill="#fff"/>
+            <g clip-path="url(#kb-band)" fill="#1c1c28">
+              <rect x="22" y="62" width="76" height="2"/>
+              <polygon points="30,52 41,52 33,64 22,64"/>
+              <polygon points="52,52 63,52 55,64 44,64"/>
+              <polygon points="74,52 85,52 77,64 66,64"/>
+              <polygon points="96,52 107,52 99,64 88,64"/>
+            </g>
+
+            <!-- Блискавка -->
+            <polygon points="69,66 46,91 60,91 53,110 81,80 67,80 75,66"
+                     fill="url(#kb-bolt)" stroke="#1c1c28" stroke-width="2.5" stroke-linejoin="round"/>
+          </svg>
+        </div>
         <div class="title">Kino<span>Battle</span></div>
         <div class="subtitle">Кіно-квіз дуель 1 на 1</div>
       </div>
@@ -196,9 +271,15 @@
         <div class="track"><div class="fill" id="timer-fill"></div></div>
         <div class="num" id="timer-num">10</div>
       </div>
-      <div class="question">
+      <div class="question" id="question">
         <div class="hint hidden" id="hint">Вгадай фільм</div>
         <div class="prompt" id="prompt"></div>
+        <div class="fact hidden" id="fact">
+          <div class="label">💡 Цікавий факт</div>
+          <div class="text" id="fact-text"></div>
+          <div class="skip">Торкніться, щоб продовжити</div>
+          <div class="bar" id="fact-bar"></div>
+        </div>
       </div>
       <div class="options" id="options"></div>
       <div class="banner hidden" id="banner"><div>Фінальне питання<b>×2</b></div></div>
@@ -225,7 +306,16 @@
 
 <script>
 // ===== Порт Engine/Scoring.swift =====
-const MatchRules = { questionsPerMatch: 7, matchLengths: [7, 14], questionTime: 10, promptLeadIn: 1, revealDuration: 2, finalBannerDuration: 1.5 };
+const MatchRules = {
+  questionsPerMatch: 7, matchLengths: [7, 14], questionTime: 10, promptLeadIn: 1, finalBannerDuration: 1.5,
+  revealMinDuration: 3, revealMaxDuration: 5, factReadingSpeed: 60,
+  // Пауза після питання: 3 с без факту, довший факт — довша пауза, але не більше 5 с.
+  revealDuration(q) {
+    // [...s].length рахує символи як Swift String.count (емодзі/сурогатні пари — по одному).
+    const extra = q.fact ? [...q.fact].length / this.factReadingSpeed : 0;
+    return Math.min(this.revealMinDuration + extra, this.revealMaxDuration);
+  },
+};
 const Scoring = {
   basePoints: 500, speedPoints: 500,
   multiplier(i, total = MatchRules.questionsPerMatch) { return i === total - 1 ? 2 : 1; },
@@ -325,6 +415,30 @@ function renderRound(round) {
   $('prompt').classList.toggle('emoji', isEmoji);
   $('prompt').textContent = round.question.prompt;
   $('options').innerHTML = '';
+  $('question').classList.remove('revealing');
+  $('fact').classList.add('hidden');
+}
+
+/// Показує факт і чекає revealDuration або тап по картці.
+function revealPause(round) {
+  const duration = MatchRules.revealDuration(round.question) * 1000;
+  const card = $('fact');
+  if (round.question.fact) {
+    $('fact-text').textContent = round.question.fact;
+    $('question').classList.add('revealing');
+    card.classList.remove('hidden');
+    const bar = $('fact-bar');
+    bar.style.transition = 'none';
+    bar.style.transform = 'scaleX(1)';
+    void bar.offsetWidth; // перезапуск анімації
+    bar.style.transition = `transform ${duration}ms linear`;
+    bar.style.transform = 'scaleX(0)';
+  }
+  return new Promise(resolve => {
+    const t = setTimeout(done, duration);
+    function done() { clearTimeout(t); card.onclick = null; resolve(); }
+    card.onclick = done;
+  });
 }
 
 function renderOptions(round, onPick) {
@@ -468,7 +582,7 @@ async function playMatch() {
     floatGain($('me-score'), mePts);
     floatGain($('bot-score'), botPts);
 
-    await sleep(MatchRules.revealDuration * 1000);
+    await revealPause(round);
     if (!alive()) return;
   }
 

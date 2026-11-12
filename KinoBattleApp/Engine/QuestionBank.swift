@@ -5,6 +5,7 @@ struct QuestionBank {
     static let optionCount = 4
     static let maxPromptLength = 120
     static let maxOptionLength = 40
+    static let maxFactLength = 160
 
     enum ValidationError: Error, Equatable {
         case empty
@@ -15,6 +16,7 @@ struct QuestionBank {
         case emptyText(String)
         case promptTooLong(String)
         case optionTooLong(String)
+        case factTooLong(String)
     }
 
     let questions: [Question]
@@ -48,12 +50,13 @@ struct QuestionBank {
             guard q.options.count == optionCount else { throw ValidationError.wrongOptionCount(q.id) }
             guard q.options.indices.contains(q.correctIndex) else { throw ValidationError.badCorrectIndex(q.id) }
             guard Set(q.options).count == q.options.count else { throw ValidationError.duplicateOptions(q.id) }
-            let texts = [q.prompt] + q.options
+            let texts = [q.prompt] + q.options + (q.fact.map { [$0] } ?? [])
             guard texts.allSatisfy({ !$0.trimmingCharacters(in: .whitespaces).isEmpty }) else {
                 throw ValidationError.emptyText(q.id)
             }
             guard q.prompt.count <= maxPromptLength else { throw ValidationError.promptTooLong(q.id) }
             guard q.options.allSatisfy({ $0.count <= maxOptionLength }) else { throw ValidationError.optionTooLong(q.id) }
+            guard (q.fact?.count ?? 0) <= maxFactLength else { throw ValidationError.factTooLong(q.id) }
         }
     }
 

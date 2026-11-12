@@ -9,8 +9,17 @@ enum MatchRules {
     static let questionTime: Double = 10
     /// Пауза між появою питання і варіантів, с.
     static let promptLeadIn: Double = 1
-    /// Тривалість розкриття правильної відповіді, с.
-    static let revealDuration: Double = 2
+    /// Пауза після відповіді (правильна відповідь + факт), с.
+    static let revealMinDuration: Double = 3
+    static let revealMaxDuration: Double = 5
+    /// Швидкість читання факту, символів за секунду понад мінімальну паузу.
+    static let factReadingSpeed: Double = 60
+
+    /// Пауза після питання: 3 с без факту, довший факт — довша пауза, але не більше 5 с.
+    static func revealDuration(for question: Question) -> Double {
+        let extra = Double(question.fact?.count ?? 0) / factReadingSpeed
+        return min(revealMinDuration + extra, revealMaxDuration)
+    }
     /// Банер «Фінальне питання ×2», с.
     static let finalBannerDuration: Double = 1.5
 }

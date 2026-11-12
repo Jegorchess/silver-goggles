@@ -6,9 +6,10 @@ func makeQuestion(
     prompt: String = "Питання?",
     options: [String] = ["A", "B", "C", "D"],
     correctIndex: Int = 0,
-    type: Question.Kind = .text
+    type: Question.Kind = .text,
+    fact: String? = nil
 ) -> Question {
-    Question(id: id, type: type, prompt: prompt, options: options, correctIndex: correctIndex)
+    Question(id: id, type: type, prompt: prompt, options: options, correctIndex: correctIndex, fact: fact)
 }
 
 final class QuestionBankTests: XCTestCase {
@@ -19,6 +20,14 @@ final class QuestionBankTests: XCTestCase {
         let bank = try QuestionBank(jsonData: Data(json.utf8))
         XCTAssertEqual(bank.questions.count, 1)
         XCTAssertEqual(bank.questions[0].type, .emoji)
+        XCTAssertNil(bank.questions[0].fact)
+    }
+
+    func testDecodesFact() throws {
+        let json = """
+        [{"id":"q1","type":"text","prompt":"?","options":["A","B","C","D"],"correctIndex":0,"fact":"Цікаво!"}]
+        """
+        XCTAssertEqual(try QuestionBank(jsonData: Data(json.utf8)).questions[0].fact, "Цікаво!")
     }
 
     func testValidationErrors() {
@@ -38,7 +47,9 @@ final class QuestionBankTests: XCTestCase {
         XCTAssertEqual(error([makeQuestion("a", prompt: "   ")]), .emptyText("a"))
         XCTAssertEqual(error([makeQuestion("a", prompt: String(repeating: "x", count: 121))]), .promptTooLong("a"))
         XCTAssertEqual(error([makeQuestion("a", options: ["A", "B", "C", String(repeating: "x", count: 41)])]), .optionTooLong("a"))
-        XCTAssertNil(error([makeQuestion("a"), makeQuestion("b")]))
+        XCTAssertEqual(error([makeQuestion("a", fact: "  ")]), .emptyText("a"))
+        XCTAssertEqual(error([makeQuestion("a", fact: String(repeating: "x", count: 161))]), .factTooLong("a"))
+        XCTAssertNil(error([makeQuestion("a"), makeQuestion("b", fact: "Факт")]))
     }
 
     func testPickAvoidsRecent() throws {
