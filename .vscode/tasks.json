@@ -30,6 +30,20 @@
       "problemMatcher": []
     },
     {
+      "label": "Content: зібрати питання",
+      "detail": "content/questions/*.json → KinoBattleApp/questions.json (з перевіркою)",
+      "type": "shell",
+      "command": "node tools/build-questions.js",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Content: докачати картинки",
+      "type": "shell",
+      "command": "node tools/fetch-media.js",
+      "problemMatcher": []
+    },
+    {
       "label": "Engine: тести (Docker)",
       "type": "shell",
       "command": "docker run --rm -v \"${workspaceFolder}:/src\" -w /src swift:6.0 swift test --scratch-path /tmp/build",

@@ -42,7 +42,7 @@ const MIME = {
   '.svg': 'image/svg+xml',
   '.png': 'image/png',
 };
-const PUBLIC_DIRS = ['preview', 'shared'];
+const PUBLIC_DIRS = ['preview', 'shared', 'KinoBattleApp/media'];
 const PUBLIC_FILES = ['KinoBattleApp/questions.json'];
 
 function resolvePublic(urlPath) {

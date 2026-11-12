@@ -41,6 +41,15 @@ test('вибір питань уникає нещодавніх і добира�
   assert.ok(!picked.includes('q3'));
 });
 
+test('у матчі питання йдуть від легших до важчих', () => {
+  const levels = [3, 1, 2, undefined, 1, 3, 2, 3, 1, 2];
+  const bank = levels.map((d, i) => q(`q${i}`, { difficulty: d }));
+  for (let i = 0; i < 20; i++) {
+    const picked = E.pickQuestions(bank, 7).map(x => x.difficulty ?? 2);
+    assert.deepEqual(picked, [...picked].sort((a, b) => a - b));
+  }
+});
+
 test('перемішування зберігає правильну відповідь', () => {
   for (let i = 0; i < 50; i++) {
     const r = E.makeRound(q('a', { correctIndex: 2 }));

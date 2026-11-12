@@ -221,6 +221,20 @@
   .fact .text { margin-top: 6px; font-size: 15px; line-height: 1.45; }
   .fact .skip { margin-top: 8px; font-size: 12px; color: var(--muted); }
   .fact .bar { position: absolute; left: 0; bottom: 0; height: 3px; width: 100%; background: var(--gold); transform-origin: left; }
+  /* Кадр і «склад» */
+  .q-media { width: 100%; margin-bottom: 12px; }
+  .q-frame img { width: 100%; height: 190px; object-fit: contain; border-radius: 14px; background: #000; display: block; transition: height .25s; }
+  .q-cast { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .q-cast img { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; object-position: 50% 20%; border-radius: 12px; display: block; background: var(--card); transition: aspect-ratio .25s; }
+  .q-cast .n { font-size: 12px; font-weight: 600; margin-top: 5px; line-height: 1.2; }
+  .q-credit { font-size: 10px; color: var(--muted); margin-top: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center; }
+  .question.media .prompt { font-size: 19px; }
+  .question.revealing .q-frame img { height: 104px; }
+  .question.revealing .q-cast img { aspect-ratio: 1 / 1; }
+  .question.revealing .q-cast .n, .question.revealing .q-credit { display: none; }
+  .question.revealing .q-media { margin-bottom: 6px; }
+  .question.revealing .fact { margin-top: 10px; }
+  .credits-list .row .main .s { white-space: normal; }
   .question.revealing .prompt { font-size: 19px; }
   .question.revealing .prompt.emoji { font-size: 44px; }
   .question.revealing .hint { display: none; }
@@ -506,6 +520,7 @@
           <button class="btn secondary" id="logout">Вийти</button>
           <button class="btn danger" id="delete-account">Видалити акаунт</button>
         </div>
+        <button class="link" id="open-credits" style="display:block; margin: 14px auto 0; font-size: 14px">Автори фото й ліцензії</button>
       </div>
     </section>
 
@@ -559,6 +574,16 @@
       </div>
     </section>
 
+    <!-- Автори зображень (вимога ліцензій CC BY / CC BY-SA) -->
+    <section id="credits" class="screen hidden">
+      <button class="back" id="credits-back">‹ Назад</button>
+      <div class="screen-title">Автори фото</div>
+      <div class="screen-sub">Кадри й фото акторів — з Wikimedia Commons, під вільними ліцензіями або в суспільному надбанні. Файли зменшено.</div>
+      <div class="scroll" style="margin-top: 14px">
+        <div class="list credits-list" id="credits-list"></div>
+      </div>
+    </section>
+
     <!-- Лобі гри з людиною -->
     <section id="lobby" class="screen hidden">
       <button class="back" id="lobby-back">‹ Назад</button>
@@ -606,6 +631,7 @@
       </div>
       <div class="question" id="question">
         <div class="hint hidden" id="hint">Вгадай фільм</div>
+        <div class="q-media hidden" id="q-media"></div>
         <div class="prompt" id="prompt"></div>
         <div class="fact hidden" id="fact">
           <div class="label">💡 Цікавий факт</div>

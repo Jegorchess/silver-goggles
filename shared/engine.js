@@ -86,8 +86,8 @@
    */
   function pickQuestions(all, count, recent = []) {
     const recentSet = new Set(recent);
-    const result = shuffled(all.filter(q => !recentSet.has(q.id)));
-    if (result.length >= count) return result.slice(0, count);
+    let result = shuffled(all.filter(q => !recentSet.has(q.id)));
+    if (result.length >= count) return byDifficulty(result.slice(0, count));
     const byId = new Map(all.map(q => [q.id, q]));
     const added = new Set(result.map(q => q.id));
     for (const id of recent) {
@@ -97,7 +97,12 @@
         result.push(byId.get(id));
       }
     }
-    return result;
+    return byDifficulty(result);
+  }
+
+  /** Від легших до важчих (стабільно; без складності — середнє), щоб матч розгонився до фіналу. */
+  function byDifficulty(questions) {
+    return questions.map((q, i) => [q.difficulty ?? 2, i, q]).sort((a, b) => a[0] - b[0] || a[1] - b[1]).map(x => x[2]);
   }
 
   /** Оновлює список нещодавніх питань: прибирає повтори, тримає останні `keep`. */
@@ -205,6 +210,8 @@
         multiplier: this.multiplier,
         type: this.round.question.type,
         prompt: this.round.question.prompt,
+        image: this.round.question.image || null,
+        cast: this.round.question.cast || null,
       });
       const banner = this.multiplier > 1 ? MatchRules.finalBannerDuration : 0;
       this.later(() => this.openAnswers(), banner + MatchRules.promptLeadIn);
@@ -319,7 +326,7 @@
 
   return {
     MatchRules, Scoring, decideOutcome,
-    shuffled, makeRound, pickQuestions, updateRecent,
+    shuffled, makeRound, pickQuestions, byDifficulty, updateRecent,
     BotConfig, botPlan, makeBot,
     Match,
   };

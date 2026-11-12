@@ -1,0 +1,852 @@
+{
+  "frame-trip-to-the-moon": {
+    "file": "media/frame-trip-to-the-moon.jpg",
+    "title": null,
+    "commons": "File:A Trip to the Moon (Le Voyage dans la Lune).jpg",
+    "wikidata": null,
+    "author": "Breve Storia del Cinema",
+    "license": "Public domain",
+    "licenseUrl": null,
+    "source": "https://commons.wikimedia.org/wiki/File:A_Trip_to_the_Moon_(Le_Voyage_dans_la_Lune).jpg"
+  },
+  "frame-great-train-robbery": {
+    "file": "media/frame-great-train-robbery.jpg",
+    "title": null,
+    "commons": "File:Great train robbery still.jpg",
+    "wikidata": null,
+    "author": "Edwin Stanton Porter",
+    "license": "Public domain",
+    "licenseUrl": null,
+    "source": "https://commons.wikimedia.org/wiki/File:Great_train_robbery_still.jpg"
+  },
+  "frame-nosferatu": {
+    "file": "media/frame-nosferatu.png",
+    "title": null,
+    "commons": "File:Nosferatu (1922) - Count Orlok Standing In A Wooden Doorway.png",
+    "wikidata": null,
+    "author": "F. W. Murnau / Henrik Galeen",
+    "license": "Public domain",
+    "licenseUrl": null,
+    "source": "https://commons.wikimedia.org/wiki/File:Nosferatu_(1922)_-_Count_Orlok_Standing_In_A_Wooden_Doorway.png"
+  },
+  "frame-caligari": {
+    "file": "media/frame-caligari.jpg",
+    "title": null,
+    "commons": "File:Cabinet caligari 1920.jpg",
+    "wikidata": null,
+    "author": "Decla-Bioscop AG",
+    "license": "Public domain",
+    "licenseUrl": null,
+    "source": "https://commons.wikimedia.org/wiki/File:Cabinet_caligari_1920.jpg"
+  },
+  "frame-potemkin": {
+    "file": "media/frame-potemkin.jpg",
+    "title": null,
+    "commons": "File:Odessastepsbaby.jpg",
+    "wikidata": null,
+    "author": "Sergei Eisenstein",
+    "license": "Public domain",
+    "licenseUrl": null,
+    "source": "https://commons.wikimedia.org/wiki/File:Odessastepsbaby.jpg"
+  },
+  "frame-the-kid": {
+    "file": "media/frame-the-kid.jpg",
+    "title": null,
+    "commons": "File:Jackie Coogan, The Kid (1921).jpg",
+    "wikidata": null,
+    "author": "Charlie Chaplin",
+    "license": "Public domain",
+    "licenseUrl": null,
+    "source": "https://commons.wikimedia.org/wiki/File:Jackie_Coogan,_The_Kid_(1921).jpg"
+  },
+  "frame-gold-rush": {
+    "file": "media/frame-gold-rush.jpg",
+    "title": null,
+    "commons": "File:Chaplin the gold rush boot.jpg",
+    "wikidata": null,
+    "author": "United Artists (work for hire)",
+    "license": "Public domain",
+    "licenseUrl": null,
+    "source": "https://commons.wikimedia.org/wiki/File:Chaplin_the_gold_rush_boot.jpg"
+  },
+  "frame-the-general": {
+    "file": "media/frame-the-general.jpg",
+    "title": null,
+    "commons": "File:Buster Keaton on the cow-catcher in The General.jpg",
+    "wikidata": null,
+    "author": "Buster Keaton Productions",
+    "license": "Public domain",
+    "licenseUrl": null,
+    "source": "https://commons.wikimedia.org/wiki/File:Buster_Keaton_on_the_cow-catcher_in_The_General.jpg"
+  },
+  "frame-steamboat-willie": {
+    "file": "media/frame-steamboat-willie.jpg",
+    "title": null,
+    "commons": "File:Mickey Mouse - Steamboat Willie (1928).jpg",
+    "wikidata": null,
+    "author": "Walt Disney / Ub Iwerks",
+    "license": "Public domain",
+    "licenseUrl": null,
+    "source": "https://commons.wikimedia.org/wiki/File:Mickey_Mouse_-_Steamboat_Willie_(1928).jpg"
+  },
+  "frame-phantom-opera": {
+    "file": "media/frame-phantom-opera.jpg",
+    "title": null,
+    "commons": "File:Lon Chaney as The Phantom.jpg",
+    "wikidata": null,
+    "author": "Universal Pictures",
+    "license": "Public domain",
+    "licenseUrl": null,
+    "source": "https://commons.wikimedia.org/wiki/File:Lon_Chaney_as_The_Phantom.jpg"
+  },
+  "actor-leonardo-dicaprio": {
+    "file": "media/actor-leonardo-dicaprio.jpg",
+    "title": "Leonardo DiCaprio",
+    "commons": "File:Leonardo DiCaprio - BFI Southbank 3 (crop).jpg",
+    "wikidata": "Q38111",
+    "author": "Raph_PH",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Leonardo_DiCaprio_-_BFI_Southbank_3_(crop).jpg"
+  },
+  "actor-kate-winslet": {
+    "file": "media/actor-kate-winslet.jpg",
+    "title": "Kate Winslet",
+    "commons": "File:KateWinslet (cropped).jpg",
+    "wikidata": "Q202765",
+    "author": "Colleen Sturtevant",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:KateWinslet_(cropped).jpg"
+  },
+  "actor-billy-zane": {
+    "file": "media/actor-billy-zane.jpg",
+    "title": "Billy Zane",
+    "commons": "File:Billy Zane Photo Op GalaxyCon Raleigh 2019.jpg",
+    "wikidata": "Q205435",
+    "author": "Super Festivals",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Billy_Zane_Photo_Op_GalaxyCon_Raleigh_2019.jpg"
+  },
+  "actor-kathy-bates": {
+    "file": "media/actor-kathy-bates.jpg",
+    "title": "Kathy Bates",
+    "commons": "File:SDCC 2015 - Kathy Bates (19551149449) (cropped).jpg",
+    "wikidata": "Q544465",
+    "author": "Gage Skidmore from Peoria, AZ, United States of America",
+    "license": "CC BY-SA 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:SDCC_2015_-_Kathy_Bates_(19551149449)_(cropped).jpg"
+  },
+  "actor-marlon-brando": {
+    "file": "media/actor-marlon-brando.png",
+    "title": "Marlon Brando",
+    "commons": "File:Marlon Brando publicity for One-Eyed Jacks.png",
+    "wikidata": "Q34012",
+    "author": "None visible/Paramount Pictures",
+    "license": "Public domain",
+    "licenseUrl": null,
+    "source": "https://commons.wikimedia.org/wiki/File:Marlon_Brando_publicity_for_One-Eyed_Jacks.png"
+  },
+  "actor-al-pacino": {
+    "file": "media/actor-al-pacino.jpg",
+    "title": "Al Pacino",
+    "commons": "File:ALPACINO 0234e (30401875260) (cropped).jpg",
+    "wikidata": "Q41163",
+    "author": "Embajada de EEUU en la Argentina",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:ALPACINO_0234e_(30401875260)_(cropped).jpg"
+  },
+  "actor-james-caan": {
+    "file": "media/actor-james-caan.jpg",
+    "title": "James Caan",
+    "commons": "File:James Caan Guillaume Canet Cannes 2013 cropped.jpg",
+    "wikidata": "Q95043",
+    "author": "Georges Biard",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:James_Caan_Guillaume_Canet_Cannes_2013_cropped.jpg"
+  },
+  "actor-robert-duvall": {
+    "file": "media/actor-robert-duvall.jpg",
+    "title": "Robert Duvall",
+    "commons": "File:Robert Duvall (actor, at home, New York City apartment, 1984) (cropped).jpg",
+    "wikidata": "Q171736",
+    "author": "Bernard Gotfryd",
+    "license": "Public domain",
+    "licenseUrl": null,
+    "source": "https://commons.wikimedia.org/wiki/File:Robert_Duvall_(actor,_at_home,_New_York_City_apartment,_1984)_(cropped).jpg"
+  },
+  "actor-john-travolta": {
+    "file": "media/actor-john-travolta.jpg",
+    "title": "John Travolta",
+    "commons": "File:John Travolta, 2014 (cropped).jpg",
+    "wikidata": "Q80938",
+    "author": "lauraleedooley",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:John_Travolta,_2014_(cropped).jpg"
+  },
+  "actor-samuel-l-jackson": {
+    "file": "media/actor-samuel-l-jackson.jpg",
+    "title": "Samuel L. Jackson",
+    "commons": "File:SamuelLJackson.jpg",
+    "wikidata": "Q172678",
+    "author": "Philip Romano",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:SamuelLJackson.jpg"
+  },
+  "actor-uma-thurman": {
+    "file": "media/actor-uma-thurman.jpg",
+    "title": "Uma Thurman",
+    "commons": "File:Uma Thurman Cannes 2017 (cropped).jpg",
+    "wikidata": "Q125017",
+    "author": "Georges Biard",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Uma_Thurman_Cannes_2017_(cropped).jpg"
+  },
+  "actor-bruce-willis": {
+    "file": "media/actor-bruce-willis.jpg",
+    "title": "Bruce Willis",
+    "commons": "File:Bruce Willis by Gage Skidmore 3.jpg",
+    "wikidata": "Q2680",
+    "author": "Gage Skidmore",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Bruce_Willis_by_Gage_Skidmore_3.jpg"
+  },
+  "actor-tom-hanks": {
+    "file": "media/actor-tom-hanks.jpg",
+    "title": "Tom Hanks",
+    "commons": "File:Tom Hanks at the Elvis Premiere 2022.jpg",
+    "wikidata": "Q2263",
+    "author": "Eva Rinaldi from Abbotsford, Australia",
+    "license": "CC BY-SA 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Tom_Hanks_at_the_Elvis_Premiere_2022.jpg"
+  },
+  "actor-robin-wright": {
+    "file": "media/actor-robin-wright.jpg",
+    "title": "Robin Wright",
+    "commons": "File:Robin Wright Cannes 2017 (cropped).jpg",
+    "wikidata": "Q272972",
+    "author": "Georges Biard",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Robin_Wright_Cannes_2017_(cropped).jpg"
+  },
+  "actor-gary-sinise": {
+    "file": "media/actor-gary-sinise.jpg",
+    "title": "Gary Sinise",
+    "commons": "File:Gary Sinise 2011 (cropped).jpg",
+    "wikidata": "Q180272",
+    "author": "U.S. Navy Petty Officer 1st Class Chad J. McNeeley",
+    "license": "Public domain",
+    "licenseUrl": null,
+    "source": "https://commons.wikimedia.org/wiki/File:Gary_Sinise_2011_(cropped).jpg"
+  },
+  "actor-sally-field": {
+    "file": "media/actor-sally-field.jpg",
+    "title": "Sally Field",
+    "commons": "File:Sally Field - Grauman's Egyptian Theatre - Norma Rae.jpg",
+    "wikidata": "Q187033",
+    "author": "Kevin Paul",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Sally_Field_-_Grauman%27s_Egyptian_Theatre_-_Norma_Rae.jpg"
+  },
+  "actor-keanu-reeves": {
+    "file": "media/actor-keanu-reeves.jpg",
+    "title": "Keanu Reeves",
+    "commons": "File:Keanu Reeves at TIFF 2025 02 (Cropped).jpg",
+    "wikidata": "Q43416",
+    "author": "Gabriel Hutchinson",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Keanu_Reeves_at_TIFF_2025_02_(Cropped).jpg"
+  },
+  "actor-laurence-fishburne": {
+    "file": "media/actor-laurence-fishburne.jpg",
+    "title": "Laurence Fishburne",
+    "commons": "File:Laurence Fishburne at 53rd Saturn Awards 2026.jpg",
+    "wikidata": "Q193048",
+    "author": "Kevin Paul",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Laurence_Fishburne_at_53rd_Saturn_Awards_2026.jpg"
+  },
+  "actor-carrie-anne-moss": {
+    "file": "media/actor-carrie-anne-moss.jpg",
+    "title": "Carrie-Anne Moss",
+    "commons": "File:Carrie-Anne Moss at 2026 Toronto International Film Festival - \"YAGA\" Premiere 14-2.jpg",
+    "wikidata": "Q206890",
+    "author": "Gabriel Hutchinson",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Carrie-Anne_Moss_at_2026_Toronto_International_Film_Festival_-_%22YAGA%22_Premiere_14-2.jpg"
+  },
+  "actor-hugo-weaving": {
+    "file": "media/actor-hugo-weaving.jpg",
+    "title": "Hugo Weaving",
+    "commons": "File:MJK 08925 Hugo Weaving (Berlinale 2018) bw.jpg",
+    "wikidata": "Q42204",
+    "author": "Martin Kraft",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:MJK_08925_Hugo_Weaving_(Berlinale_2018)_bw.jpg"
+  },
+  "actor-joseph-gordon-levitt": {
+    "file": "media/actor-joseph-gordon-levitt.jpg",
+    "title": "Joseph Gordon-Levitt",
+    "commons": "File:Joseph Gordon Levitt Sundance Film Festival 2026 (cropped).jpg",
+    "wikidata": "Q177311",
+    "author": "Colleen Sturtevant",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Joseph_Gordon_Levitt_Sundance_Film_Festival_2026_(cropped).jpg"
+  },
+  "actor-elliot-page": {
+    "file": "media/actor-elliot-page.jpg",
+    "title": "Elliot Page",
+    "commons": "File:ElliotPage-byPhilipRomano2.jpg",
+    "wikidata": "Q173399",
+    "author": "PhilipRomano",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:ElliotPage-byPhilipRomano2.jpg"
+  },
+  "actor-tom-hardy": {
+    "file": "media/actor-tom-hardy.jpg",
+    "title": "Tom Hardy",
+    "commons": "File:Tom Hardy by Gage Skidmore in 2018.jpg",
+    "wikidata": "Q208026",
+    "author": "Gage Skidmore",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Tom_Hardy_by_Gage_Skidmore_in_2018.jpg"
+  },
+  "actor-christian-bale": {
+    "file": "media/actor-christian-bale.jpg",
+    "title": "Christian Bale",
+    "commons": "File:Christian Bale-7837.jpg",
+    "wikidata": "Q45772",
+    "author": "Harald Krichel",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Christian_Bale-7837.jpg"
+  },
+  "actor-heath-ledger": {
+    "file": "media/actor-heath-ledger.jpg",
+    "title": "Heath Ledger",
+    "commons": "File:Heath Ledger.jpg",
+    "wikidata": "Q40572",
+    "author": "Howie",
+    "license": "CC BY-SA 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Heath_Ledger.jpg"
+  },
+  "actor-aaron-eckhart": {
+    "file": "media/actor-aaron-eckhart.jpg",
+    "title": "Aaron Eckhart",
+    "commons": "File:Aaron Eckhart by Gage Skidmore.jpg",
+    "wikidata": "Q192643",
+    "author": "Gage Skidmore",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Aaron_Eckhart_by_Gage_Skidmore.jpg"
+  },
+  "actor-gary-oldman": {
+    "file": "media/actor-gary-oldman.jpg",
+    "title": "Gary Oldman",
+    "commons": "File:Gary Oldman by Gage Skidmore.jpg",
+    "wikidata": "Q83492",
+    "author": "Gage Skidmore",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Gary_Oldman_by_Gage_Skidmore.jpg"
+  },
+  "actor-johnny-depp": {
+    "file": "media/actor-johnny-depp.jpg",
+    "title": "Johnny Depp",
+    "commons": "File:Johnny Depp 2020.jpg",
+    "wikidata": "Q37175",
+    "author": "Harald Krichel",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Johnny_Depp_2020.jpg"
+  },
+  "actor-orlando-bloom": {
+    "file": "media/actor-orlando-bloom.jpg",
+    "title": "Orlando Bloom",
+    "commons": "File:Orlando Bloom at the 2024 Toronto International Film Festival (cropped2).jpg",
+    "wikidata": "Q44467",
+    "author": "Kevin Payravi",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Orlando_Bloom_at_the_2024_Toronto_International_Film_Festival_(cropped2).jpg"
+  },
+  "actor-keira-knightley": {
+    "file": "media/actor-keira-knightley.jpg",
+    "title": "Keira Knightley",
+    "commons": "File:KeiraKnightleyByAndreaRaffin2011 (cropped).jpg",
+    "wikidata": "Q42581",
+    "author": "Andrea Raffin",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:KeiraKnightleyByAndreaRaffin2011_(cropped).jpg"
+  },
+  "actor-geoffrey-rush": {
+    "file": "media/actor-geoffrey-rush.jpg",
+    "title": "Geoffrey Rush",
+    "commons": "File:Geoffrey Rush Final Portrait Red Carpet Berlinale 2017 01 (cropped).jpg",
+    "wikidata": "Q166272",
+    "author": "Maximilian Bühn",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Geoffrey_Rush_Final_Portrait_Red_Carpet_Berlinale_2017_01_(cropped).jpg"
+  },
+  "actor-daniel-radcliffe": {
+    "file": "media/actor-daniel-radcliffe.jpg",
+    "title": "Daniel Radcliffe",
+    "commons": "File:Daniel Radcliffe in July 2015.jpg",
+    "wikidata": "Q38119",
+    "author": "Gage Skidmore from Peoria, AZ, United States of America",
+    "license": "CC BY-SA 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Daniel_Radcliffe_in_July_2015.jpg"
+  },
+  "actor-emma-watson": {
+    "file": "media/actor-emma-watson.jpg",
+    "title": "Emma Watson",
+    "commons": "File:Emma Watson 2013.jpg",
+    "wikidata": "Q39476",
+    "author": "Georges Biard",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Emma_Watson_2013.jpg"
+  },
+  "actor-rupert-grint": {
+    "file": "media/actor-rupert-grint.jpg",
+    "title": "Rupert Grint",
+    "commons": "File:Rupert Grint at Berlin Film Festival 2026, (P1230675) (cropped).jpg",
+    "wikidata": "Q19190",
+    "author": "User:Celestinesucess",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+    "source": "https://commons.wikimedia.org/wiki/File:Rupert_Grint_at_Berlin_Film_Festival_2026,_(P1230675)_(cropped).jpg"
+  },
+  "actor-maggie-smith": {
+    "file": "media/actor-maggie-smith.jpg",
+    "title": "Maggie Smith",
+    "commons": "File:Maggie Smith - Vintage (trim).jpg",
+    "wikidata": "Q172653",
+    "author": "N/A studio",
+    "license": "Public domain",
+    "licenseUrl": null,
+    "source": "https://commons.wikimedia.org/wiki/File:Maggie_Smith_-_Vintage_(trim).jpg"
+  },
+  "actor-elijah-wood": {
+    "file": "media/actor-elijah-wood.jpg",
+    "title": "Elijah Wood",
+    "commons": "File:Elijah Wood (47955397556) (cropped).jpg",
+    "wikidata": "Q483771",
+    "author": "Gage Skidmore from Peoria, AZ, United States of America",
+    "license": "CC BY-SA 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Elijah_Wood_(47955397556)_(cropped).jpg"
+  },
+  "actor-ian-mckellen": {
+    "file": "media/actor-ian-mckellen.jpg",
+    "title": "Ian McKellen",
+    "commons": "File:McKellenRichmnd040219-5 (46275370484) (cropped).jpg",
+    "wikidata": "Q170510",
+    "author": "Raph_PH",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:McKellenRichmnd040219-5_(46275370484)_(cropped).jpg"
+  },
+  "actor-viggo-mortensen": {
+    "file": "media/actor-viggo-mortensen.jpg",
+    "title": "Viggo Mortensen",
+    "commons": "File:Viggo Mortensen B (2020).jpg",
+    "wikidata": "Q171363",
+    "author": "Joost Pauwels",
+    "license": "CC0",
+    "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "source": "https://commons.wikimedia.org/wiki/File:Viggo_Mortensen_B_(2020).jpg"
+  },
+  "actor-matthew-mcconaughey": {
+    "file": "media/actor-matthew-mcconaughey.jpg",
+    "title": "Matthew McConaughey",
+    "commons": "File:Matthew McConaughey 2025.jpg",
+    "wikidata": "Q188955",
+    "author": "Raph_PH",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Matthew_McConaughey_2025.jpg"
+  },
+  "actor-anne-hathaway": {
+    "file": "media/actor-anne-hathaway.jpg",
+    "title": "Anne Hathaway",
+    "commons": "File:Anne Hathaway- Press conference for the film \"The Devil Wears Prada 2\" - 55194764955 (cropped).jpg",
+    "wikidata": "Q36301",
+    "author": "Ministry of culture, sports and Tourism- Lee Jeong-woo",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Anne_Hathaway-_Press_conference_for_the_film_%22The_Devil_Wears_Prada_2%22_-_55194764955_(cropped).jpg"
+  },
+  "actor-jessica-chastain": {
+    "file": "media/actor-jessica-chastain.jpg",
+    "title": "Jessica Chastain",
+    "commons": "File:Jessica Chastain-64424 (cropped).jpg",
+    "wikidata": "Q229313",
+    "author": "Harald Krichel",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Jessica_Chastain-64424_(cropped).jpg"
+  },
+  "actor-michael-caine": {
+    "file": "media/actor-michael-caine.jpg",
+    "title": "Michael Caine",
+    "commons": "File:Michael Caine - Viennale 2012 a (cropped).jpg",
+    "wikidata": "Q123351",
+    "author": "Manfred Werner / Tsui",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Michael_Caine_-_Viennale_2012_a_(cropped).jpg"
+  },
+  "actor-russell-crowe": {
+    "file": "media/actor-russell-crowe.jpg",
+    "title": "Russell Crowe",
+    "commons": "File:Russell Crowe on the Green Carpet at the 2025 Zurich Film Festival 06 (cropped).jpg",
+    "wikidata": "Q129817",
+    "author": "Quejaytee",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Russell_Crowe_on_the_Green_Carpet_at_the_2025_Zurich_Film_Festival_06_(cropped).jpg"
+  },
+  "actor-joaquin-phoenix": {
+    "file": "media/actor-joaquin-phoenix.jpg",
+    "title": "Joaquin Phoenix",
+    "commons": "File:Joaquin Phoenix in 2018.jpg",
+    "wikidata": "Q185140",
+    "author": "Harald Krichel",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Joaquin_Phoenix_in_2018.jpg"
+  },
+  "actor-connie-nielsen": {
+    "file": "media/actor-connie-nielsen.jpg",
+    "title": "Connie Nielsen",
+    "commons": "File:Connie Nielsen by Gage Skidmore (cropped).jpg",
+    "wikidata": "Q231951",
+    "author": "Gage Skidmore",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Connie_Nielsen_by_Gage_Skidmore_(cropped).jpg"
+  },
+  "actor-brad-pitt": {
+    "file": "media/actor-brad-pitt.jpg",
+    "title": "Brad Pitt",
+    "commons": "File:Brad Pitt 2019 by Glenn Francis.jpg",
+    "wikidata": "Q35332",
+    "author": "Toglenn",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Brad_Pitt_2019_by_Glenn_Francis.jpg"
+  },
+  "actor-edward-norton": {
+    "file": "media/actor-edward-norton.jpg",
+    "title": "Edward Norton",
+    "commons": "File:Ed Norton and Shauna Robertson TIFF 2025 (cropped).jpg",
+    "wikidata": "Q125904",
+    "author": "Max Surprenant",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Ed_Norton_and_Shauna_Robertson_TIFF_2025_(cropped).jpg"
+  },
+  "actor-helena-bonham-carter": {
+    "file": "media/actor-helena-bonham-carter.jpg",
+    "title": "Helena Bonham Carter",
+    "commons": "File:MerchantIvoryCurzMayfair201124 (9 of 28) (54154554480) (cropped).jpg",
+    "wikidata": "Q170428",
+    "author": "Raph_PH",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:MerchantIvoryCurzMayfair201124_(9_of_28)_(54154554480)_(cropped).jpg"
+  },
+  "actor-jared-leto": {
+    "file": "media/actor-jared-leto.jpg",
+    "title": "Jared Leto",
+    "commons": "File:Jared Leto, San Diego Comic Con 2016 (2).jpg",
+    "wikidata": "Q484523",
+    "author": "Gage Skidmore from Peoria, AZ, United States of America",
+    "license": "CC BY-SA 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Jared_Leto,_San_Diego_Comic_Con_2016_(2).jpg"
+  },
+  "actor-michael-j-fox": {
+    "file": "media/actor-michael-j-fox.jpg",
+    "title": "Michael J. Fox",
+    "commons": "File:Michael J Fox 2020.jpg",
+    "wikidata": "Q395274",
+    "author": "Chuck Kennedy (Pete for America)",
+    "license": "Public domain",
+    "licenseUrl": null,
+    "source": "https://commons.wikimedia.org/wiki/File:Michael_J_Fox_2020.jpg"
+  },
+  "actor-christopher-lloyd": {
+    "file": "media/actor-christopher-lloyd.jpg",
+    "title": "Christopher Lloyd",
+    "commons": "File:Christopher Lloyd (53135075986).jpg",
+    "wikidata": "Q109324",
+    "author": "Pedro Heshike for Galaxy Con",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Christopher_Lloyd_(53135075986).jpg"
+  },
+  "actor-lea-thompson": {
+    "file": "media/actor-lea-thompson.jpg",
+    "title": "Lea Thompson",
+    "commons": "File:Lea Thompson 2013 (cropped).jpg",
+    "wikidata": "Q230605",
+    "author": "SAMHSA",
+    "license": "Public domain",
+    "licenseUrl": null,
+    "source": "https://commons.wikimedia.org/wiki/File:Lea_Thompson_2013_(cropped).jpg"
+  },
+  "actor-crispin-glover": {
+    "file": "media/actor-crispin-glover.jpg",
+    "title": "Crispin Glover",
+    "commons": "File:Crispin Glover 2012 Shankbone.JPG",
+    "wikidata": "Q310060",
+    "author": "David Shankbone",
+    "license": "CC BY 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Crispin_Glover_2012_Shankbone.JPG"
+  },
+  "actor-george-clooney": {
+    "file": "media/actor-george-clooney.jpg",
+    "title": "George Clooney",
+    "commons": "File:George Clooney Jay Kelly-19 (cropped).jpg",
+    "wikidata": "Q23844",
+    "author": "Bryan Berlin",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:George_Clooney_Jay_Kelly-19_(cropped).jpg"
+  },
+  "actor-matt-damon": {
+    "file": "media/actor-matt-damon.jpg",
+    "title": "Matt Damon",
+    "commons": "File:MattDamon-byPhilipRomano2.jpg",
+    "wikidata": "Q175535",
+    "author": "PhilipRomano",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:MattDamon-byPhilipRomano2.jpg"
+  },
+  "actor-julia-roberts": {
+    "file": "media/actor-julia-roberts.jpg",
+    "title": "Julia Roberts",
+    "commons": "File:Julia Roberts 2025 (cropped).jpg",
+    "wikidata": "Q40523",
+    "author": "Colleen Sturtevant",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Julia_Roberts_2025_(cropped).jpg"
+  },
+  "actor-meryl-streep": {
+    "file": "media/actor-meryl-streep.jpg",
+    "title": "Meryl Streep",
+    "commons": "File:Meryl Streep- Press conference for the film \"The Devil Wears Prada 2\" - 55194765350 (cropped1).jpg",
+    "wikidata": "Q873",
+    "author": "Ministry of culture, sports and Tourism- Lee Jeong-woo",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Meryl_Streep-_Press_conference_for_the_film_%22The_Devil_Wears_Prada_2%22_-_55194765350_(cropped1).jpg"
+  },
+  "actor-emily-blunt": {
+    "file": "media/actor-emily-blunt.jpg",
+    "title": "Emily Blunt",
+    "commons": "File:Emily Blunt at WWD Style Awards 2026-02.jpg",
+    "wikidata": "Q193517",
+    "author": "Kevin Paul",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Emily_Blunt_at_WWD_Style_Awards_2026-02.jpg"
+  },
+  "actor-stanley-tucci": {
+    "file": "media/actor-stanley-tucci.jpg",
+    "title": "Stanley Tucci",
+    "commons": "File:ConclaveBFILFF101024 (9 of 44) (54062519935) (cropped).jpg",
+    "wikidata": "Q223117",
+    "author": "Raph_PH",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:ConclaveBFILFF101024_(9_of_44)_(54062519935)_(cropped).jpg"
+  },
+  "actor-cillian-murphy": {
+    "file": "media/actor-cillian-murphy.png",
+    "title": "Cillian Murphy",
+    "commons": "File:CillianMurphy-TIFF2025-01-Cropped (cropped).png",
+    "wikidata": "Q202589",
+    "author": "JoshPopov",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:CillianMurphy-TIFF2025-01-Cropped_(cropped).png"
+  },
+  "actor-robert-downey-jr": {
+    "file": "media/actor-robert-downey-jr.jpg",
+    "title": "Robert Downey Jr.",
+    "commons": "File:RobertDowneyJr-byPhilipRomano7 (cropped).jpg",
+    "wikidata": "Q165219",
+    "author": "PhilipRomano",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:RobertDowneyJr-byPhilipRomano7_(cropped).jpg"
+  },
+  "actor-chris-evans": {
+    "file": "media/actor-chris-evans.jpg",
+    "title": "Chris Evans",
+    "commons": "File:Chris Evans Red 2024.jpg",
+    "wikidata": "Q178348",
+    "author": "Amy Martin Photography",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Chris_Evans_Red_2024.jpg"
+  },
+  "actor-scarlett-johansson": {
+    "file": "media/actor-scarlett-johansson.jpg",
+    "title": "Scarlett Johansson",
+    "commons": "File:Scarlett Johansson-8588.jpg",
+    "wikidata": "Q34436",
+    "author": "Harald Krichel",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Scarlett_Johansson-8588.jpg"
+  },
+  "actor-chris-hemsworth": {
+    "file": "media/actor-chris-hemsworth.jpg",
+    "title": "Chris Hemsworth",
+    "commons": "File:Chris Hemsworth - Crime 101.jpg",
+    "wikidata": "Q54314",
+    "author": "Kevin Paul",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Chris_Hemsworth_-_Crime_101.jpg"
+  },
+  "actor-ryan-gosling": {
+    "file": "media/actor-ryan-gosling.jpg",
+    "title": "Ryan Gosling",
+    "commons": "File:GoslingBFI081223 (22 of 30) (53388157347) (cropped).jpg",
+    "wikidata": "Q193815",
+    "author": "Raph_PH",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:GoslingBFI081223_(22_of_30)_(53388157347)_(cropped).jpg"
+  },
+  "actor-emma-stone": {
+    "file": "media/actor-emma-stone.jpg",
+    "title": "Emma Stone",
+    "commons": "File:Emma Stone at the 2025 Cannes Film Festival 04.jpg",
+    "wikidata": "Q147077",
+    "author": "Gabriel Hutchinson",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Emma_Stone_at_the_2025_Cannes_Film_Festival_04.jpg"
+  },
+  "actor-john-legend": {
+    "file": "media/actor-john-legend.jpg",
+    "title": "John Legend",
+    "commons": "File:JohnLegend-byPhilipRomano.jpg",
+    "wikidata": "Q44857",
+    "author": "PhilipRomanoPhoto",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:JohnLegend-byPhilipRomano.jpg"
+  },
+  "actor-j-k-simmons": {
+    "file": "media/actor-j-k-simmons.jpg",
+    "title": "J. K. Simmons",
+    "commons": "File:JK Simmons at the 2024 Toronto International Film Festival (cropped).jpg",
+    "wikidata": "Q150482",
+    "author": "Jay Dixit",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:JK_Simmons_at_the_2024_Toronto_International_Film_Festival_(cropped).jpg"
+  },
+  "actor-margot-robbie": {
+    "file": "media/actor-margot-robbie.jpg",
+    "title": "Margot Robbie",
+    "commons": "File:SYDNEY, AUSTRALIA - JANUARY 23 Margot Robbie arrives at the Australian Premiere of 'I, Tonya' on January 23, 2018 in Sydney, Australia (25980753838) (cropped).jpg",
+    "wikidata": "Q1924847",
+    "author": "Eva Rinaldi from Sydney Australia",
+    "license": "CC BY-SA 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:SYDNEY,_AUSTRALIA_-_JANUARY_23_Margot_Robbie_arrives_at_the_Australian_Premiere_of_%27I,_Tonya%27_on_January_23,_2018_in_Sydney,_Australia_(25980753838)_(cropped).jpg"
+  },
+  "actor-america-ferrera": {
+    "file": "media/actor-america-ferrera.jpg",
+    "title": "America Ferrera",
+    "commons": "File:America Ferrera at the 2025 Toronto International Film Festival (cropped2).jpg",
+    "wikidata": "Q219402",
+    "author": "Gabriel Hutchinson",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:America_Ferrera_at_the_2025_Toronto_International_Film_Festival_(cropped2).jpg"
+  },
+  "actor-kate-mckinnon": {
+    "file": "media/actor-kate-mckinnon.jpg",
+    "title": "Kate McKinnon",
+    "commons": "File:Kate McKinnon at the 2026 Sundance Film Festival for In the Blink of an Eye (cropped).jpg",
+    "wikidata": "Q723057",
+    "author": "Sarah K Joyce",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Kate_McKinnon_at_the_2026_Sundance_Film_Festival_for_In_the_Blink_of_an_Eye_(cropped).jpg"
+  },
+  "actor-amanda-seyfried": {
+    "file": "media/actor-amanda-seyfried.jpg",
+    "title": "Amanda Seyfried",
+    "commons": "File:Amanda Seyfried at Berlinale 2024, cropped.jpg",
+    "wikidata": "Q189226",
+    "author": "Elena Ternovaja",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Amanda_Seyfried_at_Berlinale_2024,_cropped.jpg"
+  },
+  "actor-pierce-brosnan": {
+    "file": "media/actor-pierce-brosnan.jpg",
+    "title": "Pierce Brosnan",
+    "commons": "File:PierceBrosnan-byPhilipRomano.jpg",
+    "wikidata": "Q81520",
+    "author": "PhilipRomanoPhoto",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:PierceBrosnan-byPhilipRomano.jpg"
+  },
+  "actor-colin-firth": {
+    "file": "media/actor-colin-firth.jpg",
+    "title": "Colin Firth",
+    "commons": "File:Colin Firth by Gage Skidmore.jpg",
+    "wikidata": "Q162492",
+    "author": "Gage Skidmore",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Colin_Firth_by_Gage_Skidmore.jpg"
+  },
+  "actor-djimon-hounsou": {
+    "file": "media/actor-djimon-hounsou.jpg",
+    "title": "Djimon Hounsou",
+    "commons": "File:Djimon Hounsou push premiere (cropped).jpg",
+    "wikidata": "Q298682",
+    "author": "Djimon_hounsou_kimora_lee_simmons_push_premiere.jpg: Anthony Citrano derivative work: B3t (talk)",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Djimon_Hounsou_push_premiere_(cropped).jpg"
+  }
+}

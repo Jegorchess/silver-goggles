@@ -17,7 +17,11 @@
 - `Scoring.swift` — правила матчу, формула очок `round(500 + 500·t/10) × k`, визначення переможця;
 - `Opponent.swift` — протокол `Opponent`, `BotOpponent` і детермінований генератор для тестів.
 
-`KinoBattleApp/questions.json` — база питань, спільна для застосунку, превʼю й сервера.
+`KinoBattleApp/questions.json` — база питань (~300), спільна для застосунку, превʼю й сервера.
+Її **генерує** `tools/build-questions.js` з тематичних файлів `content/questions/*.json`;
+типи питань — текст, емодзі, кадр із фільму, «хто грав» (фото 4 акторів); складність 1–3.
+Картинки — у `KinoBattleApp/media/` (з Wikimedia Commons, автори — у `media/CREDITS.md`).
+Як поповнювати базу — у [content/README.md](content/README.md).
 
 `shared/engine.js` — ті самі правила на JS плюс повний перебіг матчу (`Match`). Його використовують
 і веб-превʼю (гра з ботом), і сервер (гра з людиною).

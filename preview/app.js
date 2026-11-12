@@ -62,7 +62,9 @@ let friendsPoll = 0;
 /** Таймери екрана матчу — скасовуються при переході між питаннями. */
 const ui = { timers: [], raf: 0, total: 7, opponentIsBot: true, answered: false, lobbyTimer: 0 };
 
-const SCREENS = ['welcome', 'home', 'auth', 'profile', 'leaders', 'friends', 'lobby', 'match', 'result'];
+const SCREENS = ['welcome', 'home', 'auth', 'profile', 'leaders', 'friends', 'credits', 'lobby', 'match', 'result'];
+/** Картинки питань лежать поруч із questions.json у KinoBattleApp/media. */
+const mediaUrl = file => `../KinoBattleApp/${file}`;
 function show(screen) {
   for (const id of SCREENS) $(id).classList.toggle('hidden', id !== screen);
   if (screen !== 'friends') clearInterval(friendsPoll);
@@ -768,7 +770,9 @@ const handlers = {
       $('hint').classList.toggle('hidden', !isEmoji);
       $('prompt').classList.toggle('emoji', isEmoji);
       $('prompt').textContent = m.prompt;
+      renderQuestionMedia(m);
     };
+    renderQuestionMedia(null);
     if (isFinal) {
       $('prompt').textContent = '';
       $('hint').classList.add('hidden');
@@ -919,6 +923,68 @@ const handlers = {
   },
 };
 
+/** Кадр (image) або фото акторів (cast) над питанням; підпис автора — вимога ліцензій. */
+function renderQuestionMedia(m) {
+  const box = $('q-media');
+  box.innerHTML = '';
+  box.className = 'q-media';
+  const hasMedia = !!(m && (m.image || m.cast));
+  box.classList.toggle('hidden', !hasMedia);
+  $('question').classList.toggle('media', hasMedia);
+  if (!hasMedia) return;
+  const credit = document.createElement('div');
+  credit.className = 'q-credit';
+  if (m.image) {
+    box.classList.add('q-frame');
+    const img = new Image();
+    img.alt = 'Кадр із фільму';
+    img.src = mediaUrl(m.image.file);
+    box.appendChild(img);
+    credit.textContent = `Кадр: ${m.image.credit}`;
+  } else {
+    const grid = document.createElement('div');
+    grid.className = 'q-cast';
+    for (const a of m.cast) {
+      const p = document.createElement('div');
+      const img = new Image();
+      img.alt = a.name;
+      img.src = mediaUrl(a.image.file);
+      img.title = `${a.name} — фото: ${a.image.credit}`;
+      const n = document.createElement('div');
+      n.className = 'n';
+      n.textContent = a.name;
+      p.append(img, n);
+      grid.appendChild(p);
+    }
+    box.appendChild(grid);
+    credit.textContent = `Фото: ${m.cast.map(a => a.image.credit).join('; ')}`;
+  }
+  credit.title = credit.textContent;
+  box.appendChild(credit);
+}
+
+async function openCredits() {
+  show('credits');
+  const box = $('credits-list');
+  box.innerHTML = '<div class="empty">Завантаження…</div>';
+  try {
+    const credits = await (await fetch('../KinoBattleApp/media/credits.json', { cache: 'no-store' })).json();
+    box.innerHTML = '';
+    const entries = Object.values(credits).sort((a, b) => (a.title || a.commons).localeCompare(b.title || b.commons));
+    for (const c of entries) {
+      const r = row({
+        name: c.title || c.commons.replace(/^File:/, '').replace(/\.\w+$/, ''),
+        sub: `${/^\S+\.\w{2,4}$/.test(c.author) ? 'Wikimedia Commons' : c.author} · ${c.license}`,
+      });
+      r.style.cursor = 'pointer';
+      r.onclick = () => window.open(c.source, '_blank', 'noopener');
+      box.appendChild(r);
+    }
+  } catch {
+    box.innerHTML = '<div class="empty">Не вдалося завантажити список</div>';
+  }
+}
+
 /** Підпис під рахунком; гостям — ще й кнопка «Створити акаунт». */
 function setRatingNote(text, withCta) {
   $('rating-note').className = 'rating-note soft';
@@ -1011,6 +1077,8 @@ async function init() {
   $('profile-ava').onclick = pickPhoto;
   $('photo-input').addEventListener('change', e => uploadPhoto(e.target.files[0]));
   $('photo-remove').onclick = removePhoto;
+  $('open-credits').onclick = openCredits;
+  $('credits-back').onclick = openProfile;
   $('logout').onclick = logout;
   $('delete-account').onclick = deleteAccount;
 
