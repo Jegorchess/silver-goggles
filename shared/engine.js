@@ -275,11 +275,21 @@
       this.state = 'ended';
       for (const t of this.timers) clearTimeout(t);
       this.timers.clear();
-      this.players.forEach((p, seat) => {
+      const outcomes = this.players.map((p, seat) => {
         const o = this.players[1 - seat];
-        const outcome = reason === 'opponentLeft'
+        return reason === 'opponentLeft'
           ? (p.left ? 'loss' : 'win')
           : decideOutcome(p.score, o.score, p.correct, o.correct);
+      });
+      /** Підсумок для запису в історію (сервер читає його в onEnd). */
+      this.result = {
+        reason,
+        total: this.questions.length,
+        players: this.players.map((p, seat) => ({ score: p.score, correct: p.correct, outcome: outcomes[seat] })),
+      };
+      this.players.forEach((p, seat) => {
+        const o = this.players[1 - seat];
+        const outcome = outcomes[seat];
         this.sendTo(seat, {
           t: 'end',
           outcome,

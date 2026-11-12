@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KinoBattle Duo</title>
+<!--
+  Два «телефони» поруч для перевірки гри з людиною в одному вікні.
+  Кожен — окрема копія index.html (?slot=1 / ?slot=2) зі своїм WebSocket-підключенням до сервера.
+  Один створює кімнату, другий вводить код — і далі клікаєш то там, то там.
+-->
+<style>
+  :root { --bg: #1b1b22; --muted: #9a9ab0; --accent: #ff4d6d; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    background: var(--bg); color: var(--muted);
+    font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+  .phones { flex: 1; display: flex; min-height: 0; }
+  .slot { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .slot + .slot { border-left: 1px solid #2c2c33; }
+  .label { text-align: center; font-size: 13px; font-weight: 600; letter-spacing: .5px; padding: 10px 0 0; }
+  .label b { color: var(--accent); }
+  iframe { flex: 1; width: 100%; border: 0; display: block; }
+</style>
+</head>
+<body>
+  <div class="phones">
+    <div class="slot">
+      <div class="label"><b>Телефон 1</b></div>
+      <iframe src="index.html?slot=1" title="Телефон 1"></iframe>
+    </div>
+    <div class="slot">
+      <div class="label"><b>Телефон 2</b></div>
+      <iframe src="index.html?slot=2" title="Телефон 2"></iframe>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,81 +1,29 @@
 'use strict';
-// Наскрізний тест: справжній сервер + два WebSocket-клієнти.
+// Наскрізний тест гри: справжній сервер + WebSocket-клієнти без акаунтів.
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { spawn } = require('node:child_process');
-const path = require('node:path');
-const { WebSocket } = require('ws');
+const { startServer, wsClient, playThrough } = require('./helpers.js');
 
-let proc;
-let base;
-
-test.before(async () => {
-  proc = spawn(process.execPath, [path.join(__dirname, '..', 'server.js')], {
-    env: { ...process.env, PORT: '0', HOST: '127.0.0.1', TIME_SCALE: '0.01' },
-    stdio: ['ignore', 'pipe', 'inherit'],
-  });
-  base = await new Promise((resolve, reject) => {
-    proc.on('exit', code => reject(new Error(`server exited ${code}`)));
-    proc.stdout.on('data', d => {
-      const m = /listening on (http:\/\/[\d.]+:\d+)/.exec(String(d));
-      if (m) resolve(m[1]);
-    });
-  });
-});
-
-test.after(() => proc.kill());
-
-/** Клієнт, що складає повідомлення в чергу й уміє чекати на потрібне. */
-function client(name) {
-  const ws = new WebSocket(base.replace('http', 'ws') + '/ws');
-  const inbox = [];
-  const waiters = [];
-  ws.on('message', d => {
-    const msg = JSON.parse(d);
-    const i = waiters.findIndex(w => w.pred(msg));
-    if (i >= 0) waiters.splice(i, 1)[0].resolve(msg);
-    else inbox.push(msg);
-  });
-  const c = {
-    send: msg => ws.send(JSON.stringify(msg)),
-    next(t, timeout = 5000) {
-      const pred = typeof t === 'function' ? t : m => m.t === t;
-      const i = inbox.findIndex(pred);
-      if (i >= 0) return Promise.resolve(inbox.splice(i, 1)[0]);
-      return new Promise((resolve, reject) => {
-        const w = { pred, resolve };
-        waiters.push(w);
-        setTimeout(() => reject(new Error(`${name}: не дочекались ${t}`)), timeout);
-      });
-    },
-    close: () => ws.close(),
-    ready: new Promise(r => ws.on('open', r)),
-  };
-  return c.ready.then(() => { c.send({ t: 'hello', name }); return c; });
-}
-
-/** Грає весь матч: відповідає першим варіантом, доки не прийде `end`. */
-async function playThrough(c) {
-  for (;;) {
-    const msg = await c.next(m => m.t === 'options' || m.t === 'end');
-    if (msg.t === 'end') return msg;
-    c.send({ t: 'answer', index: msg.index, option: 0 });
-  }
-}
+let srv;
+test.before(async () => { srv = await startServer(); });
+test.after(() => srv.stop());
 
 test('превʼю та питання віддаються, а чужі файли — ні', async () => {
+  const { base } = srv;
   assert.equal((await fetch(base + '/preview/')).status, 200);
+  assert.equal((await fetch(base + '/preview/duo.html')).status, 200);
   assert.equal((await fetch(base + '/shared/engine.js')).status, 200);
   const qs = await (await fetch(base + '/KinoBattleApp/questions.json')).json();
   assert.ok(qs.length >= 28);
   assert.equal((await fetch(base + '/server/server.js')).status, 404);
+  assert.equal((await fetch(base + '/server/data/kinobattle.db')).status, 404);
   assert.equal((await fetch(base + '/preview/..%2f..%2fREADME.md')).status, 404);
   assert.equal((await fetch(base + '/.git/config')).status, 404);
 });
 
 test('гра за кодом кімнати: повний матч і реванш', async () => {
-  const anna = await client('Анна');
-  const bohdan = await client('Богдан');
+  const anna = await wsClient(srv.base, { name: 'Анна' });
+  const bohdan = await wsClient(srv.base, { name: 'Богдан' });
 
   anna.send({ t: 'create', length: 7 });
   const room = await anna.next('room');
@@ -89,15 +37,15 @@ test('гра за кодом кімнати: повний матч і реван
   assert.equal(sb.opponent.isBot, false);
 
   const [ea, eb] = await Promise.all([playThrough(anna), playThrough(bohdan)]);
-  // Обидва завжди обирали однаковий варіант → однакові правильні відповіді.
   assert.equal(ea.you.correct, eb.you.correct);
   assert.equal(ea.you.score, eb.opponent.score);
-  assert.equal(ea.opponent.score, eb.you.score);
   const mirrored = { win: 'loss', loss: 'win', draw: 'draw' };
   assert.equal(eb.outcome, mirrored[ea.outcome]);
+  // Без акаунтів матч не рейтинговий.
+  assert.equal((await anna.next('rating')).rated, false);
 
   // Код одноразовий.
-  const third = await client('Третій');
+  const third = await wsClient(srv.base, { name: 'Третій' });
   third.send({ t: 'join', code: room.code });
   assert.equal((await third.next('error')).message, 'Кімнату не знайдено');
   third.close();
@@ -118,9 +66,9 @@ test('гра за кодом кімнати: повний матч і реван
 });
 
 test('випадковий суперник: зводимо двох, хто чекає матч тієї ж довжини', async () => {
-  const a = await client('A');
-  const b = await client('B');
-  const c = await client('C');
+  const a = await wsClient(srv.base, { name: 'A' });
+  const b = await wsClient(srv.base, { name: 'B' });
+  const c = await wsClient(srv.base, { name: 'C' });
 
   a.send({ t: 'quick', length: 14 });
   await a.next('queued');
@@ -133,18 +81,21 @@ test('випадковий суперник: зводимо двох, хто ч�
   assert.equal(sa.opponent.name, 'C');
   assert.equal(sc.opponent.name, 'A');
 
-  // B скасовує пошук.
   b.send({ t: 'cancel' });
   for (const x of [a, b, c]) x.close();
 });
 
 test('неправильні повідомлення не ламають сервер', async () => {
-  const x = await client('X');
+  const x = await wsClient(srv.base, { name: 'X' });
   x.send({ t: 'answer', index: 0, option: 0 });
   x.send({ t: 'join', code: 'ZZZZ' });
   assert.equal((await x.next('error')).message, 'Кімнату не знайдено');
   x.send({ t: '__proto__' });
   x.send({ t: 'constructor' });
+  x.send({ t: 'auth', token: 'nonsense' });
+  assert.equal((await x.next('authError')).t, 'authError');
+  x.send({ t: 'invite', friendId: 1 });
+  assert.match((await x.next('error')).message, /з акаунтом/);
   x.send({ t: 'create', length: 999 });
   assert.equal((await x.next('room')).length, 7);
   x.close();

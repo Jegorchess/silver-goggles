@@ -6,8 +6,8 @@
 <title>KinoBattle Preview</title>
 <!--
   Інтерактивний макет iOS-застосунку для перегляду на Windows (у VS Code Simple Browser).
-  Ігрова логіка — у ../shared/engine.js (порт KinoBattleApp/Engine/*.swift), спільна з онлайн-сервером.
-  Цю сторінку роздає server/server.js; гра з людиною йде через його WebSocket /ws.
+  Логіка UI — у app.js; правила й перебіг матчу — у ../shared/engine.js (спільні з сервером).
+  Цю сторінку роздає server/server.js: API акаунтів (/api) і гра з людьми (WebSocket /ws).
 -->
 <style>
   :root {
@@ -40,19 +40,21 @@
   }
   .island {
     position: absolute; top: 11px; left: 50%; transform: translateX(-50%);
-    width: 122px; height: 35px; border-radius: 20px; background: #000; z-index: 10;
+    width: 122px; height: 35px; border-radius: 20px; background: #000; z-index: 30;
   }
   .statusbar {
-    position: absolute; top: 0; left: 0; right: 0; height: 54px; z-index: 9;
+    position: absolute; top: 0; left: 0; right: 0; height: 54px; z-index: 29;
     display: flex; justify-content: space-between; align-items: center;
     padding: 6px 34px 0; font-size: 16px; font-weight: 600;
   }
   .homebar {
     position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
-    width: 134px; height: 5px; border-radius: 3px; background: rgba(255,255,255,.85); z-index: 10;
+    width: 134px; height: 5px; border-radius: 3px; background: rgba(255,255,255,.85); z-index: 30;
   }
   .screen { position: absolute; inset: 54px 0 34px; display: flex; flex-direction: column; padding: 12px 20px 16px; }
   .hidden { display: none !important; }
+  .scroll { flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: none; margin: 0 -20px; padding: 0 20px 8px; }
+  .scroll::-webkit-scrollbar { display: none; }
 
   button, input {
     font: inherit; color: inherit; border: none;
@@ -66,6 +68,9 @@
   .btn:active:not(:disabled) { transform: scale(.97); }
   .btn:disabled { opacity: .5; cursor: default; }
   .btn.secondary { background: var(--card-hi); }
+  .btn.small { width: auto; padding: 10px 14px; font-size: 15px; border-radius: 12px; }
+  .btn.danger { background: transparent; color: var(--bad); box-shadow: inset 0 0 0 1px rgba(255,90,90,.4); }
+  .link { background: none; color: var(--accent); font-weight: 600; font-size: 16px; padding: 10px; }
   .field {
     width: 100%; padding: 15px 16px; border-radius: 14px; background: var(--card);
     font-size: 17px; outline: none; box-shadow: inset 0 0 0 1px transparent; transition: box-shadow .15s;
@@ -73,11 +78,18 @@
   .field:focus { box-shadow: inset 0 0 0 2px var(--accent); }
   .field::placeholder { color: var(--muted); }
   .field-label { font-size: 13px; color: var(--muted); margin: 0 0 6px 4px; text-align: left; }
+  .card { background: var(--card); border-radius: 18px; padding: 16px; }
+  .card.gold { box-shadow: inset 0 0 0 1px rgba(255, 201, 77, .35); }
+  .muted { color: var(--muted); }
+  .status { min-height: 20px; text-align: center; color: var(--bad); font-size: 14px; line-height: 1.4; }
+  .back { align-self: flex-start; background: none; color: var(--accent); font-size: 17px; font-weight: 600; padding: 6px 0; }
+  .screen-title { font-size: 30px; font-weight: 800; margin-top: 4px; }
+  .screen-sub { color: var(--muted); font-size: 15px; margin-top: 2px; line-height: 1.4; }
+  .section-title { font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; margin: 20px 0 8px 4px; }
 
-  /* Головний */
-  #home { justify-content: space-between; text-align: center; }
+  /* Логотип */
   .logo {
-    margin: 28px auto 0; width: 104px; height: 104px; border-radius: 27px;
+    margin: 0 auto; width: 96px; height: 96px; border-radius: 25px;
     /* Світіння — того ж кольору, що кнопка «Грати» і слово «Battle» (--accent). */
     --glow: rgba(255, 77, 109, .45);
     --glow-strong: rgba(255, 77, 109, .65);
@@ -93,7 +105,23 @@
   .title { font-size: 34px; font-weight: 800; letter-spacing: -.5px; margin-top: 16px; }
   .title span { color: var(--accent); }
   .subtitle { color: var(--muted); margin-top: 6px; font-size: 16px; line-height: 1.4; }
-  .rules { background: var(--card); border-radius: 18px; padding: 14px 18px; text-align: left; font-size: 15px; line-height: 1.65; color: var(--muted); }
+
+  /* Вітання */
+  #welcome { justify-content: space-between; text-align: center; }
+  #welcome .hero { margin-top: 70px; }
+  .welcome-form { display: flex; flex-direction: column; gap: 12px; }
+  .perks { text-align: left; font-size: 14px; color: var(--muted); line-height: 1.6; }
+  .perks b { color: var(--text); font-weight: 600; }
+
+  /* Головний */
+  #home { justify-content: space-between; text-align: center; }
+  .topbar { display: flex; justify-content: flex-end; }
+  .me-chip { display: flex; align-items: center; gap: 8px; padding: 6px 12px 6px 6px; border-radius: 22px; background: var(--card); font-size: 15px; font-weight: 600; max-width: 100%; }
+  .me-chip .ava { width: 30px; height: 30px; border-radius: 50%; background: var(--card-hi); display: grid; place-items: center; font-size: 16px; flex: none; }
+  .me-chip .nm { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px; }
+  .badge { font-size: 12px; font-weight: 700; padding: 3px 8px; border-radius: 10px; background: var(--card-hi); color: var(--muted); white-space: nowrap; }
+  .badge.rating { background: rgba(255, 201, 77, .15); color: var(--gold); }
+  .rules { background: var(--card); border-radius: 18px; padding: 12px 18px; text-align: left; font-size: 15px; line-height: 1.6; color: var(--muted); }
   .rules b { color: var(--text); font-weight: 600; }
   .home-controls { display: flex; flex-direction: column; gap: 10px; }
   .segmented { display: flex; background: var(--card); border-radius: 14px; padding: 4px; }
@@ -101,12 +129,51 @@
   .segmented button.on { background: var(--card-hi); color: var(--text); }
   .play-row { display: flex; gap: 10px; }
   .play-row .btn { font-size: 16px; padding: 16px 8px; }
+  .play-row .btn.secondary { position: relative; }
+  .dot-badge { position: absolute; top: 8px; right: 10px; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px; background: var(--accent); color: #fff; font-size: 12px; font-weight: 800; display: grid; place-items: center; }
+
+  /* Вхід */
+  .auth-body { display: flex; flex-direction: column; gap: 12px; margin-top: 22px; }
+  .code-field { text-align: center; letter-spacing: 10px; font-size: 26px; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .dev-code { font-size: 14px; color: var(--muted); text-align: center; padding: 10px; border-radius: 12px; background: rgba(255, 201, 77, .08); box-shadow: inset 0 0 0 1px rgba(255, 201, 77, .25); }
+  .dev-code b { color: var(--gold); letter-spacing: 3px; font-size: 16px; }
+
+  /* Профіль */
+  .profile-head { display: flex; align-items: center; gap: 14px; margin-top: 10px; }
+  .profile-head .ava { width: 64px; height: 64px; border-radius: 50%; background: var(--card); display: grid; place-items: center; font-size: 32px; flex: none; }
+  .profile-head .name-field { font-size: 19px; font-weight: 800; padding: 8px 10px; margin-left: -10px; background: transparent; }
+  .profile-head .name-field:focus { background: var(--card); }
+  .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .stat { background: var(--card); border-radius: 14px; padding: 12px 8px; text-align: center; }
+  .stat .v { font-size: 20px; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .stat .l { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .cta { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+  .cta .t { font-weight: 700; }
+  .cta .d { font-size: 14px; color: var(--muted); line-height: 1.45; }
+  .list { display: flex; flex-direction: column; gap: 8px; }
+  .row { display: flex; align-items: center; gap: 12px; background: var(--card); border-radius: 14px; padding: 12px 14px; }
+  .row.me { box-shadow: inset 0 0 0 2px var(--gold); }
+  .row .ic { font-size: 22px; width: 30px; text-align: center; flex: none; }
+  .row .main { flex: 1; min-width: 0; }
+  .row .main .n { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .row .main .s { font-size: 13px; color: var(--muted); margin-top: 2px; }
+  .row .side { text-align: right; flex: none; font-variant-numeric: tabular-nums; }
+  .row .side .o { font-size: 13px; font-weight: 700; }
+  .o.win { color: var(--good); } .o.loss { color: var(--bad); } .o.draw { color: var(--muted); }
+  .row .rank { width: 30px; text-align: center; font-weight: 800; color: var(--muted); flex: none; }
+  .online-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--muted); margin-right: 6px; vertical-align: middle; }
+  .online-dot.on { background: var(--good); }
+  .empty { color: var(--muted); font-size: 14px; text-align: center; padding: 16px; }
+  .profile-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 24px; }
+  .friend-code { font-size: 32px; font-weight: 800; letter-spacing: 6px; color: var(--gold); margin-top: 4px; font-variant-numeric: tabular-nums; }
+  .add-row { display: flex; gap: 10px; margin-top: 12px; }
+  .add-row .field { flex: 1; text-transform: uppercase; letter-spacing: 4px; font-weight: 700; }
+  .add-row .field::placeholder { letter-spacing: 1px; font-weight: 500; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 50%; background: var(--card-hi); display: grid; place-items: center; font-size: 15px; flex: none; }
+  .icon-btn.ok { background: rgba(47,210,122,.2); color: var(--good); }
 
   /* Лобі */
   #lobby { gap: 12px; }
-  .back { align-self: flex-start; background: none; color: var(--accent); font-size: 17px; font-weight: 600; padding: 6px 0; }
-  .lobby-title { font-size: 30px; font-weight: 800; margin-top: 4px; }
-  .lobby-sub { color: var(--muted); font-size: 15px; margin-top: -4px; }
   .lobby-menu { display: flex; flex-direction: column; gap: 12px; margin-top: 18px; }
   .divider { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 13px; margin: 6px 0; }
   .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: var(--card-hi); }
@@ -121,7 +188,6 @@
   .wait-hint { color: var(--muted); font-size: 15px; line-height: 1.4; max-width: 290px; }
   .room-code { font-size: 54px; font-weight: 800; letter-spacing: 12px; padding: 10px 14px 10px 26px; border-radius: 18px; background: var(--card); color: var(--gold); font-variant-numeric: tabular-nums; }
   .lobby-wait .btn { max-width: 300px; }
-  .status { min-height: 20px; text-align: center; color: var(--bad); font-size: 14px; line-height: 1.4; }
 
   /* Матч */
   .scorebar { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
@@ -192,19 +258,32 @@
 
   /* Результат */
   #result { text-align: center; justify-content: space-between; }
-  .verdict-emoji { font-size: 84px; margin-top: 50px; }
+  .verdict-emoji { font-size: 76px; margin-top: 30px; }
   .verdict { font-size: 38px; font-weight: 800; margin-top: 6px; }
   .verdict.win { color: var(--gold); } .verdict.loss { color: var(--bad); } .verdict.draw { color: var(--muted); }
   .verdict-note { color: var(--muted); font-size: 15px; margin-top: 6px; min-height: 20px; }
-  .final-scores { display: flex; gap: 12px; margin-top: 24px; }
-  .final-scores .col { flex: 1; min-width: 0; background: var(--card); border-radius: 18px; padding: 18px 10px; }
+  .final-scores { display: flex; gap: 12px; margin-top: 20px; }
+  .final-scores .col { flex: 1; min-width: 0; background: var(--card); border-radius: 18px; padding: 16px 10px; }
   .final-scores .col.winner { box-shadow: inset 0 0 0 2px var(--gold); }
-  .final-scores .ava { font-size: 36px; }
+  .final-scores .ava { font-size: 34px; }
   .final-scores .nm { color: var(--muted); font-size: 14px; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .final-scores .pts { font-size: 30px; font-weight: 800; margin-top: 6px; font-variant-numeric: tabular-nums; }
   .final-scores .cr { color: var(--muted); font-size: 14px; margin-top: 2px; }
+  .rating-note { margin-top: 16px; font-size: 16px; font-weight: 700; min-height: 22px; }
+  .rating-note .up { color: var(--good); } .rating-note .down { color: var(--bad); }
+  .rating-note.soft { font-size: 14px; font-weight: 500; color: var(--muted); }
   .actions { display: flex; flex-direction: column; gap: 10px; }
   .rematch-note { color: var(--gold); font-size: 15px; font-weight: 600; min-height: 20px; }
+
+  /* Спливні */
+  .modal { position: absolute; inset: 0; z-index: 25; display: flex; align-items: flex-end; padding: 0 14px 46px; background: rgba(0,0,0,.55); animation: fade .2s ease-out; }
+  .sheet { width: 100%; background: var(--card-hi); border-radius: 24px; padding: 22px 18px 18px; text-align: center; animation: slideup .25s ease-out; }
+  @keyframes slideup { from { transform: translateY(40px); opacity: 0; } }
+  .sheet .big { font-size: 44px; }
+  .sheet .t { font-size: 20px; font-weight: 800; margin-top: 6px; }
+  .sheet .d { color: var(--muted); font-size: 15px; margin-top: 6px; line-height: 1.4; }
+  .sheet .btns { display: flex; gap: 10px; margin-top: 18px; }
+  .toast { position: absolute; top: 62px; left: 50%; transform: translateX(-50%); z-index: 26; max-width: 330px; padding: 10px 16px; border-radius: 14px; background: var(--card-hi); font-size: 14px; font-weight: 600; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,.4); animation: pop .25s ease-out; }
 
   .error { margin: auto; text-align: center; color: var(--muted); line-height: 1.5; }
   .error b { color: var(--bad); display: block; font-size: 18px; margin-bottom: 8px; }
@@ -216,58 +295,79 @@
     <div class="island"></div>
     <div class="statusbar"><span id="clock">9:41</span><span>📶 🔋</span></div>
 
-    <section id="home" class="screen">
-      <div>
-        <div class="logo" aria-hidden="true">
-          <!-- Логотип: хлопавка з блискавкою («кіно» + «батл»). Основа для майбутньої AppIcon. -->
-          <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <linearGradient id="kb-bg" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0" stop-color="#ff4d6d"/>
-                <stop offset=".55" stop-color="#ff7a45"/>
-                <stop offset="1" stop-color="#ffc94d"/>
-              </linearGradient>
-              <linearGradient id="kb-bolt" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0" stop-color="#ffc94d"/>
-                <stop offset="1" stop-color="#ff4d6d"/>
-              </linearGradient>
-              <radialGradient id="kb-shine" cx=".3" cy=".1" r=".8">
-                <stop offset="0" stop-color="#fff" stop-opacity=".35"/>
-                <stop offset="1" stop-color="#fff" stop-opacity="0"/>
-              </radialGradient>
-              <clipPath id="kb-clapper"><rect x="22" y="34" width="76" height="14" rx="4"/></clipPath>
-              <clipPath id="kb-band"><rect x="22" y="52" width="76" height="12"/></clipPath>
-            </defs>
-
-            <rect width="120" height="120" rx="30" fill="url(#kb-bg)"/>
-            <rect width="120" height="120" rx="30" fill="url(#kb-shine)"/>
-
-            <!-- Верхня планка хлопавки, трохи відкрита -->
-            <g transform="rotate(-15 22 50)">
-              <rect x="22" y="34" width="76" height="14" rx="4" fill="#fff"/>
-              <g clip-path="url(#kb-clapper)" fill="#1c1c28">
-                <polygon points="30,34 41,34 33,48 22,48"/>
-                <polygon points="52,34 63,34 55,48 44,48"/>
-                <polygon points="74,34 85,34 77,48 66,48"/>
-                <polygon points="96,34 107,34 99,48 88,48"/>
-              </g>
+    <template id="logo-tpl">
+      <div class="logo" aria-hidden="true">
+        <!-- Логотип: хлопавка з блискавкою («кіно» + «батл»). Основа для майбутньої AppIcon. -->
+        <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="kb-bg" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#ff4d6d"/>
+              <stop offset=".55" stop-color="#ff7a45"/>
+              <stop offset="1" stop-color="#ffc94d"/>
+            </linearGradient>
+            <linearGradient id="kb-bolt" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#ffc94d"/>
+              <stop offset="1" stop-color="#ff4d6d"/>
+            </linearGradient>
+            <radialGradient id="kb-shine" cx=".3" cy=".1" r=".8">
+              <stop offset="0" stop-color="#fff" stop-opacity=".35"/>
+              <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+            </radialGradient>
+            <clipPath id="kb-clapper"><rect x="22" y="34" width="76" height="14" rx="4"/></clipPath>
+            <clipPath id="kb-band"><rect x="22" y="52" width="76" height="12"/></clipPath>
+          </defs>
+          <rect width="120" height="120" rx="30" fill="url(#kb-bg)"/>
+          <rect width="120" height="120" rx="30" fill="url(#kb-shine)"/>
+          <g transform="rotate(-15 22 50)">
+            <rect x="22" y="34" width="76" height="14" rx="4" fill="#fff"/>
+            <g clip-path="url(#kb-clapper)" fill="#1c1c28">
+              <polygon points="30,34 41,34 33,48 22,48"/>
+              <polygon points="52,34 63,34 55,48 44,48"/>
+              <polygon points="74,34 85,34 77,48 66,48"/>
+              <polygon points="96,34 107,34 99,48 88,48"/>
             </g>
+          </g>
+          <rect x="22" y="52" width="76" height="46" rx="8" fill="#fff"/>
+          <g clip-path="url(#kb-band)" fill="#1c1c28">
+            <rect x="22" y="62" width="76" height="2"/>
+            <polygon points="30,52 41,52 33,64 22,64"/>
+            <polygon points="52,52 63,52 55,64 44,64"/>
+            <polygon points="74,52 85,52 77,64 66,64"/>
+            <polygon points="96,52 107,52 99,64 88,64"/>
+          </g>
+          <polygon points="69,66 46,91 60,91 53,110 81,80 67,80 75,66"
+                   fill="url(#kb-bolt)" stroke="#1c1c28" stroke-width="2.5" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    </template>
 
-            <!-- Корпус -->
-            <rect x="22" y="52" width="76" height="46" rx="8" fill="#fff"/>
-            <g clip-path="url(#kb-band)" fill="#1c1c28">
-              <rect x="22" y="62" width="76" height="2"/>
-              <polygon points="30,52 41,52 33,64 22,64"/>
-              <polygon points="52,52 63,52 55,64 44,64"/>
-              <polygon points="74,52 85,52 77,64 66,64"/>
-              <polygon points="96,52 107,52 99,64 88,64"/>
-            </g>
-
-            <!-- Блискавка -->
-            <polygon points="69,66 46,91 60,91 53,110 81,80 67,80 75,66"
-                     fill="url(#kb-bolt)" stroke="#1c1c28" stroke-width="2.5" stroke-linejoin="round"/>
-          </svg>
+    <!-- Вітання: перший запуск -->
+    <section id="welcome" class="screen hidden">
+      <div class="hero">
+        <div data-logo></div>
+        <div class="title">Kino<span>Battle</span></div>
+        <div class="subtitle">Кіно-квіз дуель 1 на 1</div>
+      </div>
+      <div class="welcome-form">
+        <div>
+          <div class="field-label">Як тебе звати?</div>
+          <input class="field" id="welcome-name" maxlength="24" placeholder="Імʼя в грі" autocomplete="nickname">
         </div>
+        <button class="btn" id="welcome-guest">Грати як гість</button>
+        <button class="link" id="welcome-login">У мене вже є акаунт</button>
+        <div class="status" id="welcome-status"></div>
+      </div>
+    </section>
+
+    <!-- Головний -->
+    <section id="home" class="screen hidden">
+      <div>
+        <div class="topbar">
+          <button class="me-chip" id="me-chip">
+            <span class="ava">🎬</span><span class="nm" id="chip-name"></span><span class="badge" id="chip-badge"></span>
+          </button>
+        </div>
+        <div data-logo style="margin-top: 6px"></div>
         <div class="title">Kino<span>Battle</span></div>
         <div class="subtitle">Кіно-квіз дуель 1 на 1</div>
       </div>
@@ -277,22 +377,119 @@
         Фінальне питання — <b>×2</b>
       </div>
       <div class="home-controls">
-        <div>
-          <div class="field-label">Твоє імʼя</div>
-          <input class="field" id="name-input" maxlength="16" placeholder="Гравець" autocomplete="nickname">
-        </div>
         <div class="segmented" id="length-picker"></div>
         <div class="play-row">
           <button class="btn" id="play-bot">🍿 З ботом</button>
           <button class="btn" id="play-online">🎭 З людиною</button>
         </div>
+        <div class="play-row">
+          <button class="btn secondary" id="open-leaders">🏆 Рейтинг</button>
+          <button class="btn secondary" id="open-friends">👥 Друзі<span class="dot-badge hidden" id="friends-badge"></span></button>
+        </div>
       </div>
     </section>
 
+    <!-- Вхід / реєстрація через пошту -->
+    <section id="auth" class="screen hidden">
+      <button class="back" data-back>‹ Назад</button>
+      <div class="screen-title" id="auth-title">Акаунт</div>
+      <div class="screen-sub" id="auth-sub"></div>
+      <div class="auth-body" id="auth-step-email">
+        <input class="field" id="auth-email" type="email" placeholder="пошта@приклад.com" autocomplete="email">
+        <button class="btn" id="auth-send">Надіслати код</button>
+      </div>
+      <div class="auth-body hidden" id="auth-step-code">
+        <div class="screen-sub" id="auth-sent-to"></div>
+        <input class="field code-field" id="auth-code" inputmode="numeric" maxlength="6" placeholder="••••••" autocomplete="one-time-code">
+        <div class="dev-code hidden" id="auth-dev"></div>
+        <button class="btn" id="auth-verify">Підтвердити</button>
+        <button class="link" id="auth-change">Інша пошта</button>
+      </div>
+      <div class="status" id="auth-status" style="margin-top: 12px"></div>
+    </section>
+
+    <!-- Профіль -->
+    <section id="profile" class="screen hidden">
+      <button class="back" data-back>‹ Назад</button>
+      <div class="scroll">
+        <div class="profile-head">
+          <div class="ava">🎬</div>
+          <div style="min-width:0; flex:1">
+            <input class="field name-field" id="profile-name" maxlength="24">
+            <div class="muted" id="profile-sub" style="font-size:14px"></div>
+          </div>
+        </div>
+        <div class="card gold cta hidden" id="profile-cta">
+          <div class="t">🔒 Ти граєш як гість</div>
+          <div class="d">Створи акаунт — усі твої матчі збережуться, ти потрапиш у таблицю лідерів і зможеш грати з друзями.</div>
+          <button class="btn" data-upgrade>Створити акаунт</button>
+        </div>
+        <div class="section-title">Статистика</div>
+        <div class="stats-grid" id="profile-stats"></div>
+        <div class="section-title">Останні матчі</div>
+        <div class="list" id="profile-history"></div>
+        <div class="profile-actions" id="profile-actions">
+          <button class="btn secondary" id="logout">Вийти</button>
+          <button class="btn danger" id="delete-account">Видалити акаунт</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Таблиця лідерів -->
+    <section id="leaders" class="screen hidden">
+      <button class="back" data-back>‹ Назад</button>
+      <div class="screen-title">Таблиця лідерів</div>
+      <div class="screen-sub">Рейтинг за матчі з людьми</div>
+      <div class="scroll" style="margin-top: 14px">
+        <div class="card gold cta hidden" id="leaders-cta" style="margin: 0 0 14px">
+          <div class="t">🔒 Гості не потрапляють у рейтинг</div>
+          <div class="d">Створи акаунт — і кожна перемога над іншим гравцем підніматиме тебе в цій таблиці.</div>
+          <button class="btn" data-upgrade>Створити акаунт</button>
+        </div>
+        <div class="card hidden" id="leaders-unranked" style="margin-bottom: 14px; font-size: 14px; color: var(--muted); line-height: 1.45"></div>
+        <div class="list" id="leaders-list"></div>
+      </div>
+    </section>
+
+    <!-- Друзі -->
+    <section id="friends" class="screen hidden">
+      <button class="back" data-back>‹ Назад</button>
+      <div class="screen-title">Друзі</div>
+      <div class="scroll" style="margin-top: 14px">
+        <div class="card gold cta hidden" id="friends-cta" style="margin-top: 0">
+          <div class="t">🔒 Друзі — лише з акаунтом</div>
+          <div class="d">Додавай друзів за кодом і клич їх на дуель одним тапом — без кодів кімнат.</div>
+          <button class="btn" data-upgrade>Створити акаунт</button>
+        </div>
+        <div id="friends-body" class="hidden">
+          <div class="card">
+            <div class="muted" style="font-size: 14px">Твій код друга</div>
+            <div class="friend-code" id="my-friend-code"></div>
+            <div class="add-row">
+              <input class="field" id="friend-code-input" maxlength="6" placeholder="Код друга" autocomplete="off" spellcheck="false">
+              <button class="btn small" id="add-friend">Додати</button>
+            </div>
+          </div>
+          <div class="status" id="friends-status" style="margin-top: 10px"></div>
+          <div id="incoming-wrap" class="hidden">
+            <div class="section-title">Запити в друзі</div>
+            <div class="list" id="incoming-list"></div>
+          </div>
+          <div class="section-title">Друзі</div>
+          <div class="list" id="friends-list"></div>
+          <div id="outgoing-wrap" class="hidden">
+            <div class="section-title">Очікують підтвердження</div>
+            <div class="list" id="outgoing-list"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Лобі гри з людиною -->
     <section id="lobby" class="screen hidden">
       <button class="back" id="lobby-back">‹ Назад</button>
-      <div class="lobby-title">Гра з людиною</div>
-      <div class="lobby-sub" id="lobby-sub"></div>
+      <div class="screen-title">Гра з людиною</div>
+      <div class="screen-sub" id="lobby-sub"></div>
 
       <div class="lobby-menu" id="lobby-menu">
         <button class="btn" id="quick">🎲 Випадковий суперник</button>
@@ -316,6 +513,7 @@
       <div class="status" id="lobby-status"></div>
     </section>
 
+    <!-- Матч -->
     <section id="match" class="screen hidden">
       <div class="scorebar">
         <div class="player">
@@ -346,6 +544,7 @@
       <div class="banner hidden" id="banner"><div>Фінальне питання<b>×2</b></div></div>
     </section>
 
+    <!-- Результат -->
     <section id="result" class="screen hidden">
       <div>
         <div class="verdict-emoji" id="verdict-emoji"></div>
@@ -355,6 +554,8 @@
           <div class="col" id="res-me"><div class="ava"></div><div class="nm"></div><div class="pts"></div><div class="cr"></div></div>
           <div class="col" id="res-opp"><div class="ava"></div><div class="nm"></div><div class="pts"></div><div class="cr"></div></div>
         </div>
+        <div class="rating-note" id="rating-note"></div>
+        <button class="link hidden" id="result-cta" data-upgrade>Створити акаунт →</button>
       </div>
       <div class="actions">
         <div class="rematch-note" id="rematch-note"></div>
@@ -363,431 +564,25 @@
       </div>
     </section>
 
+    <!-- Запрошення від друга -->
+    <div class="modal hidden" id="invite-modal">
+      <div class="sheet">
+        <div class="big">⚔️</div>
+        <div class="t" id="invite-title"></div>
+        <div class="d" id="invite-desc"></div>
+        <div class="btns">
+          <button class="btn secondary" id="invite-decline">Відхилити</button>
+          <button class="btn" id="invite-accept">Прийняти</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast hidden" id="toast"></div>
     <div class="homebar"></div>
   </div>
 </div>
 
 <script src="../shared/engine.js"></script>
-<script>
-const { MatchRules, Match, makeBot, pickQuestions, updateRecent } = window.KinoEngine;
-
-// ===== Збереження (лише зручності конкретного браузера) =====
-const store = {
-  get(key, fallback) { try { const v = localStorage.getItem(key); return v == null ? fallback : JSON.parse(v); } catch { return fallback; } },
-  set(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch {} },
-};
-const RECENT_KEY = 'kinobattle.recent';
-const LENGTH_KEY = 'kinobattle.matchLength';
-const NAME_KEY = 'kinobattle.name';
-
-// ===== Стан =====
-const $ = id => document.getElementById(id);
-let bank = [];
-let matchLength = MatchRules.matchLengths.includes(store.get(LENGTH_KEY)) ? store.get(LENGTH_KEY) : MatchRules.questionsPerMatch;
-/** Поточна гра: { kind: 'bot' | 'online', send(msg), close() }. */
-let session = null;
-let ws = null;
-/** Таймери поточного екрана матчу — скасовуються при переході між питаннями. */
-const ui = { timers: [], raf: 0, total: 7, opponentIsBot: true, answered: false, lobbyTimer: 0 };
-
-function myName() {
-  const v = $('name-input').value.replace(/\s+/g, ' ').trim();
-  return v || 'Гравець';
-}
-
-function show(screen) {
-  for (const id of ['home', 'lobby', 'match', 'result']) $(id).classList.toggle('hidden', id !== screen);
-}
-
-function uiLater(fn, ms) { ui.timers.push(setTimeout(fn, ms)); }
-function clearUi() {
-  ui.timers.forEach(clearTimeout);
-  ui.timers = [];
-  cancelAnimationFrame(ui.raf);
-}
-
-function endSession() {
-  clearUi();
-  clearTimeout(ui.lobbyTimer);
-  if (session) session.close();
-  session = null;
-}
-
-// ===== Гра з ботом: той самий Match, що й на сервері, але локально =====
-function startBotMatch() {
-  endSession();
-  const recent = store.get(RECENT_KEY, []);
-  const questions = pickQuestions(bank, matchLength, recent);
-  store.set(RECENT_KEY, updateRecent(recent, questions));
-  const me = { name: myName(), avatar: '🎬', send: msg => onMessage(msg) };
-  const match = new Match({ questions, players: [me, makeBot()] });
-  const s = {
-    kind: 'bot',
-    send(msg) {
-      if (session !== s) return;
-      if (msg.t === 'answer') match.answer(0, msg.index, msg.option);
-      else if (msg.t === 'skip') match.skip(0, msg.index);
-      else if (msg.t === 'rematch') startBotMatch();
-    },
-    close() { match.abort(); },
-  };
-  session = s;
-  match.start();
-}
-
-// ===== Гра з людиною: WebSocket до server/server.js =====
-function connect() {
-  if (ws && ws.readyState === WebSocket.OPEN) return Promise.resolve(ws);
-  if (location.protocol === 'file:') return Promise.reject(new Error('file'));
-  return new Promise((resolve, reject) => {
-    const sock = new WebSocket(`${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws`);
-    sock.onopen = () => { ws = sock; resolve(sock); };
-    sock.onerror = () => reject(new Error('ws'));
-    sock.onclose = () => { if (ws === sock) { ws = null; onDisconnect(); } };
-    sock.onmessage = e => {
-      let msg;
-      try { msg = JSON.parse(e.data); } catch { return; }
-      if (session && session.kind === 'online') onMessage(msg);
-    };
-  });
-}
-
-async function goOnline(msg) {
-  endSession();
-  $('lobby-status').textContent = '';
-  let sock;
-  try {
-    sock = await connect();
-  } catch {
-    showLobbyMenu();
-    $('lobby-status').textContent = 'Немає звʼязку з сервером. Запусти його: завдання VS Code «Preview: запустити сервер» (node server/server.js).';
-    return;
-  }
-  const s = {
-    kind: 'online',
-    send(m) { if (sock.readyState === WebSocket.OPEN) sock.send(JSON.stringify(m)); },
-    close() { this.send({ t: 'leave' }); },
-  };
-  session = s;
-  s.send({ t: 'hello', name: myName() });
-  s.send(msg);
-}
-
-function onDisconnect() {
-  if (!session || session.kind !== 'online') return;
-  session = null;
-  clearUi();
-  clearTimeout(ui.lobbyTimer);
-  show('lobby');
-  showLobbyMenu();
-  $('lobby-status').textContent = 'Звʼязок із сервером втрачено.';
-}
-
-// ===== Лобі =====
-function showLobby() {
-  $('lobby-sub').textContent = `${matchLength} питань · граєш як «${myName()}»`;
-  $('lobby-status').textContent = '';
-  showLobbyMenu();
-  show('lobby');
-}
-
-function showLobbyMenu() {
-  clearTimeout(ui.lobbyTimer);
-  $('lobby-menu').classList.remove('hidden');
-  $('lobby-wait').classList.add('hidden');
-  $('lobby-back').classList.remove('hidden');
-}
-
-function showLobbyWait({ text, hint = '', code = null }) {
-  $('lobby-menu').classList.add('hidden');
-  $('lobby-wait').classList.remove('hidden');
-  $('lobby-back').classList.add('hidden');
-  $('wait-text').textContent = text;
-  $('wait-hint').textContent = hint;
-  $('room-code').classList.toggle('hidden', !code);
-  $('room-code').textContent = code || '';
-  $('bot-instead').classList.add('hidden');
-}
-
-// ===== Повідомлення матчу (однакові від локального Match і від сервера) =====
-const handlers = {
-  queued() {
-    showLobbyWait({ text: 'Шукаємо суперника…', hint: `Матч на ${matchLength} питань` });
-    clearTimeout(ui.lobbyTimer);
-    ui.lobbyTimer = setTimeout(() => {
-      $('wait-hint').textContent = 'Поки нікого немає. Можна зачекати ще або зіграти з ботом.';
-      $('bot-instead').classList.remove('hidden');
-    }, 20000);
-  },
-
-  room(m) {
-    showLobbyWait({ text: 'Кімнату створено', code: m.code, hint: `Скажи другу цей код — він вводить його в «Гра з людиною». Матч на ${m.length} питань.` });
-  },
-
-  error(m) {
-    if (!$('lobby').classList.contains('hidden')) {
-      showLobbyMenu();
-      $('lobby-status').textContent = m.message;
-    }
-  },
-
-  start(m) {
-    clearTimeout(ui.lobbyTimer);
-    clearUi();
-    ui.total = m.total;
-    ui.opponentIsBot = m.opponent.isBot;
-    $('me-ava').textContent = m.you.avatar;
-    $('me-name').textContent = 'Ти';
-    $('opp-ava').textContent = m.opponent.avatar;
-    $('opp-name').textContent = m.opponent.name;
-    $('me-score').textContent = '0';
-    $('opp-score').textContent = '0';
-    for (const [col, p, nm] of [['res-me', m.you, 'Ти'], ['res-opp', m.opponent, m.opponent.name]]) {
-      $(col).querySelector('.ava').textContent = p.avatar;
-      $(col).querySelector('.nm').textContent = nm;
-    }
-    $('options').innerHTML = '';
-    $('prompt').textContent = '';
-    $('fact').classList.add('hidden');
-    show('match');
-  },
-
-  question(m) {
-    clearUi();
-    const isFinal = m.multiplier > 1;
-    $('counter').textContent = isFinal ? 'Фінал ×2' : `${m.index + 1}/${m.total}`;
-    $('counter').classList.toggle('final', isFinal);
-    $('me-tick').classList.add('hidden');
-    $('opp-tick').classList.add('hidden');
-    $('options').innerHTML = '';
-    $('fact').classList.add('hidden');
-    $('question').classList.remove('revealing');
-    setTimer(MatchRules.questionTime);
-    const showPrompt = () => {
-      $('banner').classList.add('hidden');
-      const isEmoji = m.type === 'emoji';
-      $('hint').classList.toggle('hidden', !isEmoji);
-      $('prompt').classList.toggle('emoji', isEmoji);
-      $('prompt').textContent = m.prompt;
-    };
-    if (isFinal) {
-      $('prompt').textContent = '';
-      $('hint').classList.add('hidden');
-      $('banner').classList.remove('hidden');
-      uiLater(showPrompt, MatchRules.finalBannerDuration * 1000);
-    } else {
-      showPrompt();
-    }
-  },
-
-  options(m) {
-    ui.answered = false;
-    const box = $('options');
-    box.innerHTML = '';
-    m.options.forEach((text, i) => {
-      const b = document.createElement('button');
-      b.className = 'opt';
-      b.innerHTML = '<span></span><span class="marks"></span>';
-      b.firstChild.textContent = text;
-      b.onclick = () => {
-        if (ui.answered) return;
-        ui.answered = true;
-        b.classList.add('picked');
-        for (const x of box.children) x.disabled = true;
-        session?.send({ t: 'answer', index: m.index, option: i });
-      };
-      box.appendChild(b);
-    });
-    // Відлік лише для показу; час відповіді міряє матч (на сервері — сервер).
-    const start = performance.now();
-    const frame = () => {
-      const left = m.time - (performance.now() - start) / 1000;
-      setTimer(left);
-      if (left > 0) ui.raf = requestAnimationFrame(frame);
-    };
-    ui.raf = requestAnimationFrame(frame);
-  },
-
-  answerAccepted() { $('me-tick').classList.remove('hidden'); },
-  opponentAnswered() { $('opp-tick').classList.remove('hidden'); },
-
-  reveal(m) {
-    cancelAnimationFrame(ui.raf);
-    [...$('options').children].forEach((b, i) => {
-      b.disabled = true;
-      b.classList.remove('picked');
-      const marks = b.querySelector('.marks');
-      if (m.you.option === i) marks.insertAdjacentHTML('beforeend', `<span>${$('me-ava').textContent}</span>`);
-      if (m.opponent.option === i) marks.insertAdjacentHTML('beforeend', `<span>${$('opp-ava').textContent}</span>`);
-      if (i === m.correctIndex) b.classList.add('correct');
-      else if (m.you.option === i || m.opponent.option === i) b.classList.add('wrong');
-      else b.classList.add('dim');
-    });
-    $('me-score').textContent = m.you.score;
-    $('opp-score').textContent = m.opponent.score;
-    floatGain($('me-score'), m.you.points);
-    floatGain($('opp-score'), m.opponent.points);
-
-    if (m.fact) {
-      $('fact-text').textContent = m.fact;
-      $('fact-skip').textContent = 'Торкніться, щоб продовжити';
-      $('question').classList.add('revealing');
-      const card = $('fact');
-      card.classList.remove('hidden');
-      const bar = $('fact-bar');
-      bar.style.transition = 'none';
-      bar.style.transform = 'scaleX(1)';
-      void bar.offsetWidth; // перезапуск анімації
-      bar.style.transition = `transform ${m.duration * 1000}ms linear`;
-      bar.style.transform = 'scaleX(0)';
-      card.onclick = () => {
-        card.onclick = null;
-        if (!ui.opponentIsBot) $('fact-skip').textContent = 'Чекаємо на суперника…';
-        session?.send({ t: 'skip', index: m.index });
-      };
-    }
-  },
-
-  opponentReady() {
-    if (!$('fact').classList.contains('hidden') && $('fact').onclick) $('fact-skip').textContent = 'Суперник готовий — торкніться, щоб продовжити';
-  },
-
-  end(m) {
-    clearUi();
-    $('banner').classList.add('hidden');
-    const left = m.reason === 'opponentLeft';
-    const text = left ? ['🏆', 'Перемога!'] : { win: ['🏆', 'Перемога!'], loss: ['😤', 'Поразка'], draw: ['🤝', 'Нічия'] }[m.outcome];
-    $('verdict-emoji').textContent = text[0];
-    $('verdict').textContent = text[1];
-    $('verdict').className = `verdict ${m.outcome}`;
-    $('verdict-note').textContent = left ? 'Суперник вийшов з матчу' : '';
-    const fill = (id, p, isWinner) => {
-      $(id).querySelector('.pts').textContent = p.score;
-      $(id).querySelector('.cr').textContent = `${p.correct} з ${m.total} правильно`;
-      $(id).classList.toggle('winner', isWinner);
-    };
-    fill('res-me', m.you, m.outcome === 'win');
-    fill('res-opp', m.opponent, m.outcome === 'loss');
-    $('rematch').disabled = left;
-    $('rematch').textContent = 'Реванш';
-    $('rematch-note').textContent = '';
-    show('result');
-  },
-
-  rematchRequested() {
-    $('rematch').textContent = 'Прийняти реванш';
-    $('rematch-note').textContent = 'Суперник хоче реванш!';
-  },
-
-  opponentLeft() {
-    if (!$('result').classList.contains('hidden')) {
-      $('rematch').disabled = true;
-      $('rematch').textContent = 'Реванш';
-      // Якщо матч і так завершився через вихід суперника, про це вже сказано над рахунком.
-      $('rematch-note').textContent = $('verdict-note').textContent ? '' : 'Суперник пішов';
-    } else if (!$('lobby').classList.contains('hidden')) {
-      showLobbyMenu();
-    }
-  },
-};
-
-function onMessage(msg) {
-  const h = Object.hasOwn(handlers, msg.t) ? handlers[msg.t] : null;
-  if (h) h(msg);
-}
-
-// ===== Дрібниці UI =====
-function fitToWindow() {
-  const s = Math.min(1, (innerHeight - 40) / 844, (innerWidth - 40) / 390);
-  $('stage').style.transform = `scale(${s})`;
-}
-
-function tickClock() {
-  const d = new Date();
-  $('clock').textContent = `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`;
-}
-
-function setTimer(left) {
-  const frac = Math.max(0, left) / MatchRules.questionTime;
-  const fill = $('timer-fill');
-  fill.style.width = `${frac * 100}%`;
-  fill.style.background = frac > 0.5 ? 'var(--good)' : frac > 0.25 ? 'var(--gold)' : 'var(--bad)';
-  $('timer-num').textContent = Math.ceil(Math.max(0, left));
-}
-
-function floatGain(anchor, points) {
-  if (!points) return;
-  const el = document.createElement('div');
-  el.className = 'gain';
-  el.textContent = `+${points}`;
-  const host = $('match');
-  const a = anchor.getBoundingClientRect(), h = host.getBoundingClientRect();
-  const scale = h.width / host.offsetWidth;
-  el.style.left = `${(a.left - h.left) / scale}px`;
-  el.style.top = `${(a.bottom - h.top) / scale + 2}px`;
-  host.appendChild(el);
-  setTimeout(() => el.remove(), 1500);
-}
-
-function renderLengthPicker() {
-  const box = $('length-picker');
-  box.innerHTML = '';
-  for (const n of MatchRules.matchLengths) {
-    const b = document.createElement('button');
-    b.textContent = `${n} питань`;
-    b.classList.toggle('on', n === matchLength);
-    b.onclick = () => { matchLength = n; store.set(LENGTH_KEY, n); renderLengthPicker(); };
-    box.appendChild(b);
-  }
-  $('rules-count').textContent = `${matchLength} питань`;
-}
-
-async function init() {
-  $('name-input').value = store.get(NAME_KEY, '');
-  $('name-input').addEventListener('input', () => store.set(NAME_KEY, $('name-input').value));
-  renderLengthPicker();
-
-  $('play-bot').onclick = startBotMatch;
-  $('play-online').onclick = showLobby;
-
-  $('lobby-back').onclick = () => { endSession(); show('home'); };
-  $('quick').onclick = () => { showLobbyWait({ text: 'Підключаємось…' }); goOnline({ t: 'quick', length: matchLength }); };
-  $('create').onclick = () => { showLobbyWait({ text: 'Створюємо кімнату…' }); goOnline({ t: 'create', length: matchLength }); };
-  const join = () => {
-    const code = $('code-input').value.trim().toUpperCase();
-    if (code.length !== 4) { $('lobby-status').textContent = 'Код кімнати — 4 символи'; return; }
-    showLobbyWait({ text: 'Підключаємось…' });
-    goOnline({ t: 'join', code });
-  };
-  $('join').onclick = join;
-  $('code-input').addEventListener('keydown', e => { if (e.key === 'Enter') join(); });
-  $('cancel-wait').onclick = () => { endSession(); showLobbyMenu(); };
-  $('bot-instead').onclick = startBotMatch;
-
-  $('rematch').onclick = () => {
-    if (session?.kind === 'online') {
-      $('rematch').disabled = true;
-      $('rematch-note').textContent = 'Чекаємо на суперника…';
-    }
-    session?.send({ t: 'rematch' });
-  };
-  $('to-home').onclick = () => { endSession(); show('home'); };
-
-  fitToWindow();
-  addEventListener('resize', fitToWindow);
-  tickClock();
-  setInterval(tickClock, 10000);
-
-  try {
-    const r = await fetch('../KinoBattleApp/questions.json', { cache: 'no-store' });
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
-    bank = await r.json();
-  } catch (e) {
-    $('home').innerHTML = `<div class="error"><b>Не вдалося завантажити questions.json</b>
-      Запусти сервер (VS Code: завдання «Preview: запустити сервер») і відкрий http://localhost:5180/preview/<br><br>${e.message}</div>`;
-  }
-}
-init();
-</script>
+<script src="app.js"></script>
 </body>
 </html>

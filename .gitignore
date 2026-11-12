@@ -6,3 +6,4 @@ build/
 .build/
 .swiftpm/
 node_modules/
+server/data/
